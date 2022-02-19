@@ -13,7 +13,7 @@ Captures and reports to Sentry:
 
 Add the plugin as a dependency in `Cargo.toml`:
 
-```yaml
+```toml
 [dependencies]
 sentry-tauri = {git = "https://github.com/timfish/sentry-tauri"}
 ```
@@ -41,8 +41,23 @@ fn main() {
 - Injects and initialises `@sentry/browser` in every web-view
 - Includes a `TauriIntegration` that intercepts events and breadcrumbs and passes
   them to Rust via Tauri `invoke` API
-- Tauri + `serde` + existing Sentry Rust types = De-serialisation mostly Just Works™️
+- Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just Works™️
 - [`sentry_contrib_breakpad`](https://github.com/embarkstudios/sentry-contrib-rust)
   captures native crashes via breakpad and sends them via the Sentry Rust SDK
 
 ## Example App
+
+Install dependencies:
+
+```shell
+> cd examples/basic-app
+> yarn install
+```
+
+In `examples/basic-app/src-tauri/src/main.rs` replace `__YOUR_DSN__` with your DSN
+
+Run in development mode:
+
+```shell
+> yarn tauri dev
+```
