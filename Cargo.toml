@@ -1,0 +1,13 @@
+[package]
+edition = "2021"
+license = "Apache-2.0 OR MIT"
+name = "sentry-tauri"
+version = "0.0.1"
+
+[dependencies]
+sentry = "0.24"
+sentry-contrib-breakpad = "0.2"
+serde = "1.0"
+serde_json = "1.0"
+tauri = "1.0.0-rc.3"
+thiserror = "1.0"
