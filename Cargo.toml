@@ -5,6 +5,7 @@ name = "sentry-tauri"
 version = "0.0.1"
 
 [dependencies]
+dirs-next = "2.0"
 sentry = "0.24"
 sentry-contrib-breakpad = "0.2"
 serde = "1.0"

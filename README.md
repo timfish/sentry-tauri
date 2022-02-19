@@ -23,6 +23,7 @@ Initialise the plugin and pass it to Tauri:
 ```rust
 fn main() {
     let (_guard, sentry) = sentry_tauri::init(
+        "App Name",
         "__YOUR_DSN__",
         Some(env!("CARGO_PKG_VERSION")),
     )
@@ -43,3 +44,5 @@ fn main() {
 - Tauri + `serde` + existing Sentry Rust types = De-serialisation mostly Just Works™️
 - [`sentry_contrib_breakpad`](https://github.com/embarkstudios/sentry-contrib-rust)
   captures native crashes via breakpad and sends them via the Sentry Rust SDK
+
+## Example App

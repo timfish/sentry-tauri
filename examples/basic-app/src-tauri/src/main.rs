@@ -25,7 +25,8 @@ fn native_crash() {
 
 fn main() {
     let (_guard, sentry) = sentry_tauri::init(
-        "https://233a45e5efe34c47a3536797ce15dafa@o447951.ingest.sentry.io/5650507",
+        "Tauri Test App",
+        "__YOUR_DSN__",
         Some(env!("CARGO_PKG_VERSION")),
     )
     .expect("Could not start Sentry");

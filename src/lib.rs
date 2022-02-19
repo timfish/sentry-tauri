@@ -32,6 +32,7 @@ fn breadcrumb<R: Runtime>(_app: AppHandle<R>, _window: Window<R>, breadcrumb: Br
 }
 
 pub fn init<R: Runtime>(
+    name: &str,
     dsn: &str,
     release: Option<&str>,
 ) -> Result<((ClientInitGuard, BreakpadIntegration), TauriPlugin<R>), Error> {
@@ -51,11 +52,12 @@ pub fn init<R: Runtime>(
 
     let sentry_guard = sentry::init(sentry_options);
 
-    let breakpad_guard = BreakpadIntegration::new(
-        "C:\\Users\\tim\\Documents\\Repositories\\tauri-test-app",
-        InstallOptions::BothHandlers,
-        Hub::current(),
-    )?;
+    let crashes_dir = dirs_next::data_local_dir()
+        .expect("Could not find local config directory")
+        .join(format!("{} Crashes", name));
+
+    let breakpad_guard =
+        BreakpadIntegration::new(crashes_dir, InstallOptions::BothHandlers, Hub::current())?;
 
     let javascript = include_str!("../webview-dist/index.min.js");
 
