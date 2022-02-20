@@ -1,13 +1,12 @@
 # `sentry-tauri`
 
-A Tauri Plugin for Sentry.
+An experimental Tauri Plugin for Sentry.
 
 Captures and reports to Sentry:
 
-- JavaScript errors and breadcrumbs in Tauri web-views using `@sentry/browser`
+- JavaScript errors and breadcrumbs in Tauri windows using `@sentry/browser`
 - Panics and breadcrumbs in Rust via the Sentry Rust SDK
 - Native crashes as minidumps
-- Merges breadcrumbs from all Rust + JavaScript
 
 ## Installation
 
