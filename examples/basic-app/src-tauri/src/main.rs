@@ -24,20 +24,27 @@ fn native_crash() {
 }
 
 fn main() {
-    let (_guard, sentry) = sentry_tauri::init(
-        "Tauri Test App",
-        "__YOUR_DSN__",
-        Some(env!("CARGO_PKG_VERSION")),
-    )
-    .expect("Could not start Sentry");
-
-    tauri::Builder::default()
-        .plugin(sentry)
-        .invoke_handler(tauri::generate_handler![
-            rust_breadcrumb,
-            rust_panic,
-            native_crash
-        ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    sentry_tauri::init(
+        sentry::release_name!(),
+        |_| {
+            sentry::init((
+                "__YOUR_DSN__",
+                sentry::ClientOptions {
+                    release: sentry::release_name!(),
+                    ..Default::default()
+                },
+            ))
+        },
+        |sentry_plugin| {
+            tauri::Builder::default()
+                .plugin(sentry_plugin)
+                .invoke_handler(tauri::generate_handler![
+                    rust_breadcrumb,
+                    rust_panic,
+                    native_crash
+                ])
+                .run(tauri::generate_context!())
+                .expect("error while running tauri application");
+        },
+    );
 }

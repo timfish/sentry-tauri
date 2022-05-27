@@ -1,22 +1,11 @@
-use sentry::{protocol::Event, transports::DefaultTransportFactory, types::ParseDsnError, *};
-use sentry_contrib_breakpad::{Error as BreakpadError, *};
-use std::sync::Arc;
+use sentry::{protocol::Event, *};
 use tauri::{
     generate_handler,
     plugin::{Builder, TauriPlugin},
     AppHandle, Runtime, Window,
 };
-use thiserror::Error;
 
 pub use sentry::{add_breadcrumb, capture_error, Breadcrumb};
-
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("Error parsing DSN: {0}")]
-    ParseDsnError(#[from] ParseDsnError),
-    #[error("Breakpad error: {0}")]
-    BreakpadError(#[from] BreakpadError),
-}
 
 #[tauri::command]
 fn event<R: Runtime>(_app: AppHandle<R>, _window: Window<R>, mut event: Event<'static>) {
@@ -31,34 +20,16 @@ fn breadcrumb<R: Runtime>(_app: AppHandle<R>, _window: Window<R>, breadcrumb: Br
     add_breadcrumb(breadcrumb);
 }
 
-pub fn init<R: Runtime>(
-    name: &str,
-    dsn: &str,
-    release: Option<&str>,
-) -> Result<((ClientInitGuard, BreakpadIntegration), TauriPlugin<R>), Error> {
-    let transport = BreakpadTransportFactory::new(
-        CrashSendStyle::SendNextSession,
-        Arc::new(DefaultTransportFactory {}),
-    );
-
-    let sentry_options = ClientOptions {
-        #[cfg(debug_assertions)]
-        debug: true,
-        dsn: dsn.into_dsn()?,
-        release: release.map(|r| r.to_string().into()),
-        transport: Some(Arc::new(transport)),
-        ..Default::default()
-    };
-
-    let sentry_guard = sentry::init(sentry_options);
-
-    let crashes_dir = dirs_next::data_local_dir()
-        .expect("Could not find local config directory")
-        .join(format!("{} Crashes", name));
-
-    let breakpad_guard =
-        BreakpadIntegration::new(crashes_dir, InstallOptions::BothHandlers, Hub::current())?;
-
+pub fn init<Runtime, Release, SentryInitFn, RunAppFn>(
+    release: Option<Release>,
+    init_sentry: SentryInitFn,
+    run_app: RunAppFn,
+) where
+    Runtime: tauri::Runtime,
+    Release: Into<String>,
+    SentryInitFn: FnOnce(bool) -> sentry::ClientInitGuard,
+    RunAppFn: FnOnce(TauriPlugin<Runtime>),
+{
     let javascript = include_str!("../webview-dist/index.min.js");
 
     #[cfg(not(debug_assertions))]
@@ -66,11 +37,14 @@ pub fn init<R: Runtime>(
     #[cfg(debug_assertions)]
     let javascript = javascript.replace("\"{{debug}}\"", "true");
 
-    Ok((
-        (sentry_guard, breakpad_guard),
-        Builder::new("sentry")
-            .js_init_script(javascript)
-            .invoke_handler(generate_handler![event, breadcrumb])
-            .build(),
-    ))
+    let plugin = Builder::new("sentry")
+        .js_init_script(javascript)
+        .invoke_handler(generate_handler![event, breadcrumb])
+        .build();
+
+    let run_app_wrap = || {
+        run_app(plugin);
+    };
+
+    sentry_rust_minidump::init(release, init_sentry, run_app_wrap)
 }

@@ -5,10 +5,9 @@ name = "sentry-tauri"
 version = "0.0.1"
 
 [dependencies]
-dirs-next = "2.0"
-sentry = "0.24"
-sentry-contrib-breakpad = "0.2"
+sentry = {git = "https://github.com/getsentry/sentry-rust.git"}
+sentry-rust-minidump = {git = "https://github.com/timfish/sentry-rust-minidump.git"}
 serde = "1.0"
 serde_json = "1.0"
-tauri = "1.0.0-rc.3"
+tauri = "1.0.0-rc.12"
 thiserror = "1.0"

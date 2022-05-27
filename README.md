@@ -21,17 +21,24 @@ Initialise the plugin and pass it to Tauri:
 
 ```rust
 fn main() {
-    let (_guard, sentry) = sentry_tauri::init(
-        "App Name",
-        "__YOUR_DSN__",
-        Some(env!("CARGO_PKG_VERSION")),
-    )
-    .expect("Could not start Sentry");
-
-    tauri::Builder::default()
-        .plugin(sentry)
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+  sentry_tauri::init(
+      sentry::release_name!(),
+      |_| {
+          sentry::init((
+              "__YOUR_DSN__",
+              sentry::ClientOptions {
+                  release: sentry::release_name!(),
+                  ..Default::default()
+              },
+          ))
+      },
+      |sentry_plugin| {
+          tauri::Builder::default()
+              .plugin(sentry_plugin)
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+      },
+  );
 }
 ```
 
@@ -41,8 +48,16 @@ fn main() {
 - Includes a `TauriIntegration` that intercepts events and breadcrumbs and passes
   them to Rust via Tauri `invoke` API
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just Works™️
-- [`sentry_contrib_breakpad`](https://github.com/embarkstudios/sentry-contrib-rust)
-  captures native crashes via breakpad and sends them via the Sentry Rust SDK
+- [`sentry-rust-minidump`](https://github.com/timfish/sentry-rust-minidump)
+  which in turn uses the `minidumper` and `crash-handler` crates to capture
+  minidumps in pure Rust and sends them via the Sentry Rust SDK
+
+## Points to Note 📝
+
+- This is using Sentry from git master until [this
+  PR](https://github.com/getsentry/sentry-rust/pull/466) makes it into a release
+- Minidumps events in Sentry are missing breadcrumbs because they are sent from
+  another process. An API [like this](https://github.com/getsentry/sentry-rust/pull/469) should help fix this.
 
 ## Example App
 
