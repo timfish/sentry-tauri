@@ -14,10 +14,9 @@ Add the plugin as a dependency in `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentry-tauri = {git = "https://github.com/timfish/sentry-tauri"}
+sentry = "0.27"
+sentry-tauri = "0.1"
 ```
-
-Initialise the plugin and pass it to Tauri:
 
 ```rust
 fn main() {
@@ -46,22 +45,20 @@ fn main() {
 
 - Injects and initialises `@sentry/browser` in every web-view
 - Includes a `TauriIntegration` that intercepts events and breadcrumbs and passes
-  them to Rust via Tauri `invoke` API
+  them to Rust via the Tauri `invoke` API
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just Works™️
-- [`sentry-rust-minidump`](https://github.com/timfish/sentry-rust-minidump)
+- Uses [`sentry-rust-minidump`](https://github.com/timfish/sentry-rust-minidump)
   which in turn uses the `minidumper` and `crash-handler` crates to capture
-  minidumps in pure Rust and sends them via the Sentry Rust SDK
+  minidumps in pure Rust and sends them as attachments using the Sentry Rust SDK
 
 ## Points to Note 📝
 
-- This is using Sentry from git master until [this
-  PR](https://github.com/getsentry/sentry-rust/pull/466) makes it into a release
-- Minidumps events in Sentry are missing breadcrumbs because they are sent from
-  another process. An API [like this](https://github.com/getsentry/sentry-rust/pull/469) should help fix this.
+- There is currently no breadcrumb and scope synchronisation to the crash
+  reporting process so these are missing from minidump events
 
 ## Example App
 
-Install dependencies:
+Clone this repository and install dependencies:
 
 ```shell
 > cd examples/basic-app

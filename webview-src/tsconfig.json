@@ -16,6 +16,8 @@
     // advanced
     "skipLibCheck": true,
     "rootDir": "./",
+    "outDir": "../webview-dist/",
+    "declaration": true
   },
   "exclude": [
     "node_modules"

@@ -4,7 +4,7 @@ import typescript from "@rollup/plugin-typescript";
 
 export default [
   {
-    input: "./webview-src/index.ts",
+    input: "./webview-src/inject.ts",
     output: {
       dir: "./webview-dist",
       entryFileNames: "[name].min.js",
@@ -15,6 +15,7 @@ export default [
       terser({ format: { comments: false } }),
       typescript({
         tsconfig: "./webview-src/tsconfig.json",
+        outDir: "./webview-dist",
       }),
     ],
   },

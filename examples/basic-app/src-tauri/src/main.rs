@@ -5,8 +5,8 @@
 
 #[tauri::command]
 fn rust_breadcrumb() {
-    sentry_tauri::add_breadcrumb(sentry_tauri::Breadcrumb {
-        message: Some("This is a breadcrumb from Rust".to_string()),
+    sentry::add_breadcrumb(sentry::Breadcrumb {
+        message: Some("This is a breadcrumb from Rust".to_owned()),
         ..Default::default()
     })
 }
@@ -18,6 +18,7 @@ fn rust_panic() {
 
 #[tauri::command]
 fn native_crash() {
+    #[allow(deref_nullptr)]
     unsafe {
         *std::ptr::null_mut() = true;
     }
@@ -28,7 +29,7 @@ fn main() {
         sentry::release_name!(),
         |_| {
             sentry::init((
-                "__YOUR_DSN__",
+                "https://233a45e5efe34c47a3536797ce15dafa@o447951.ingest.sentry.io/5650507",
                 sentry::ClientOptions {
                     release: sentry::release_name!(),
                     ..Default::default()
