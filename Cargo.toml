@@ -2,9 +2,9 @@
 description = "An experimental Tauri Plugin for Sentry"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-name = "sentry-tauri"
+name = "tauri-plugin-sentry"
 readme = "README.md"
-repository = "https://github.com/timfish/sentry-tauri"
+repository = "https://github.com/JonasKruckenberg/sentry-tauri"
 version = "0.1.0"
 
 [dependencies]
