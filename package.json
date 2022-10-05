@@ -1,29 +1,27 @@
 {
-  "name": "@timfish/sentry-tauri",
+  "name": "tauri-plugin-sentry-api",
   "version": "0.1.0",
   "description": "Tauri Plugin for Sentry",
   "license": "Apache-2.0 OR MIT",
   "files": [
     "webview-dist"
   ],
-  "main": "./webview-dist/index.js",
-  "types": "./webview-dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": "./webview-dist/index.mjs",
+    "types": "./webview-dist/index.d.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc --project ./webview-src/tsconfig.json && rollup -c ./webview-src/rollup.config.js",
-    "prepublishOnly": "yarn build"
+    "build": "tsup"
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "13.3.0",
-    "@rollup/plugin-typescript": "8.3.3",
-    "@sentry/browser": "^7.2.0",
-    "@sentry/core": "^7.2.0",
-    "@sentry/types": "^7.2.0",
-    "rollup": "2.75.7",
-    "rollup-plugin-terser": "7.0.2",
+    "tsup": "^6.2.3",
     "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.0.1",
+    "@sentry/browser": "^7.2.0",
     "tslib": "^2.4.0"
   }
 }
