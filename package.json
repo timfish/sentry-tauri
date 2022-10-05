@@ -10,7 +10,7 @@
     "./package.json": "./package.json",
     ".": {
       "import": "./webview-dist/index.mjs",
-    "types": "./webview-dist/index.d.ts"
+      "types": "./webview-dist/index.d.ts"
     }
   },
   "scripts": {
