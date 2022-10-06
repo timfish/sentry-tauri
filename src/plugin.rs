@@ -21,7 +21,8 @@ impl<'a> From<ClientOptions> for JavaScriptInit<'a> {
       .dsn
       .expect("A DSN must be configured")
       .to_string()
-      .replace(":", "");
+      // to_string() on DSN produces an invalid DSN string, we strip the superflous colons here
+      .replace(":@", "@");
 
     Self {
       dsn,
