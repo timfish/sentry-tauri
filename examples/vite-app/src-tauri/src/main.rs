@@ -28,7 +28,7 @@ fn native_crash() {
 
 fn main() {
     let sentry_options = sentry::ClientOptions {
-        dsn: "https://cd1169c0f3334d53b97db60d1ca1ac01@o4503930527088640.ingest.sentry.io/4503930528399360".into_dsn().expect("failed to parse DSN"),
+        dsn: "__YOUR_DSN__".into_dsn().expect("failed to parse DSN"),
         release: sentry::release_name!(),
         ..Default::default()
     };
