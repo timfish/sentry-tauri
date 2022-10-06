@@ -17,8 +17,11 @@ struct JavaScriptInit<'a> {
 
 impl<'a> From<ClientOptions> for JavaScriptInit<'a> {
   fn from(opts: ClientOptions) -> Self {
+    let dsn = opts.dsn.expect("A DSN must be configured").to_string();
+    println!("dsn {}", dsn);
+    
     Self {
-      dsn: opts.dsn.expect("A DSN must be configured").to_string(),
+      dsn,
       release: opts.release,
       environment: opts.environment,
       debug: opts.debug,
