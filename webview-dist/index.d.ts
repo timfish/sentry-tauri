@@ -3,12 +3,7 @@ export * from '@sentry/browser';
 
 declare global {
     interface Window {
-        __SENTRY_INIT__: {
-            dsn: string;
-            release?: string;
-            environment?: string;
-            debug: boolean;
-        };
+        __SENTRY_DEBUG__: boolean;
     }
 }
 declare function init(options?: BrowserOptions): void;

@@ -1,5 +1,5 @@
 {
-  "name": "tauri-plugin-sentry-api",
+  "name": "@timfish/sentry-tauri",
   "version": "0.1.0",
   "description": "Tauri Plugin for Sentry",
   "license": "Apache-2.0 OR MIT",
@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@sentry/browser": "^7.2.0",
+    "@tauri-apps/api": "^1.1.0",
     "tslib": "^2.4.0"
   }
 }
