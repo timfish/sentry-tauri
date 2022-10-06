@@ -1,7 +1,5 @@
 mod plugin;
 
-pub use sentry;
-
 pub fn init<'a, R, SentryInitFn, RunAppFn>(init_sentry: SentryInitFn, run_app: RunAppFn)
 where
   R: tauri::Runtime,
