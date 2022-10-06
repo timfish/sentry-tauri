@@ -6,8 +6,8 @@
   "files": [
     "webview-dist"
   ],
-  "module": "client-dist/index.mjs",
-  "types": "client-dist/index.d.ts",
+  "module": "./webview-dist/index.mjs",
+  "types": "./webview-dist/index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
