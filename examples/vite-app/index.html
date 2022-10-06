@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/style.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tauri App</title>
+    <script type="module" src="/src/main.ts" defer></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      button {
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>sentry-tauri</h1>
+    <div class="buttons">
+      <button id="js-breadcrumb">JavaScript Breadcrumb</button>
+      <button id="rust-breadcrumb">Rust Breadcrumb</button>
+      <button id="js-error">JavaScript Error</button>
+      <button id="rust-panic">Rust Panic</button>
+      <button id="native-crash">Native Crash</button>
+    </div>
+  </body>
+</html>

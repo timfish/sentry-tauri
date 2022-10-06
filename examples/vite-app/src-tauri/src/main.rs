@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use sentry::IntoDsn;
+
 #[tauri::command]
 fn rust_breadcrumb() {
     sentry::add_breadcrumb(sentry::Breadcrumb {
@@ -25,25 +27,18 @@ fn native_crash() {
 }
 
 fn main() {
+    let sentry_options = sentry::ClientOptions {
+        dsn: "https://cd1169c0f3334d53b97db60d1ca1ac01@o4503930527088640.ingest.sentry.io/4503930528399360".into_dsn().expect("failed to parse DSN"),
+        release: sentry::release_name!(),
+        ..Default::default()
+    };
+
     sentry_tauri::init(
-        sentry::release_name!(),
-        |_| {
-            sentry::init((
-                "https://233a45e5efe34c47a3536797ce15dafa@o447951.ingest.sentry.io/5650507",
-                sentry::ClientOptions {
-                    release: sentry::release_name!(),
-                    ..Default::default()
-                },
-            ))
-        },
+        |_| sentry::init(sentry_options),
         |sentry_plugin| {
             tauri::Builder::default()
                 .plugin(sentry_plugin)
-                .invoke_handler(tauri::generate_handler![
-                    rust_breadcrumb,
-                    rust_panic,
-                    native_crash
-                ])
+                .invoke_handler(tauri::generate_handler![rust_breadcrumb, rust_panic, native_crash])
                 .run(tauri::generate_context!())
                 .expect("error while running tauri application");
         },
