@@ -12,6 +12,48 @@
   resolved "https://registry.yarnpkg.com/@esbuild/linux-loong64/-/linux-loong64-0.15.10.tgz#78a42897c2cf8db9fd5f1811f7590393b77774c7"
   integrity sha512-w0Ou3Z83LOYEkwaui2M8VwIp+nLi/NA60lBLMvaJ+vXVMcsARYdEzLNE7RSm4+lSg4zq4d7fAVuzk7PNQ5JFgg==
 
+"@sentry/browser@^7.2.0":
+  version "7.14.2"
+  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-7.14.2.tgz#668359603e3f32e6debf6a139652f5233b4d3e58"
+  integrity sha512-KGAZ+5lK7gIO2CM3/MAQGY8JtNVCWXRi807lAxndJ3E1oIQb9A0x7b+AJNr1+6jlwf6QESblr92MCLKPHDpNbA==
+  dependencies:
+    "@sentry/core" "7.14.2"
+    "@sentry/types" "7.14.2"
+    "@sentry/utils" "7.14.2"
+    tslib "^1.9.3"
+
+"@sentry/core@7.14.2":
+  version "7.14.2"
+  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-7.14.2.tgz#47262aad43d94d8c5fb73b668a7e8e9c4b91c98f"
+  integrity sha512-AXcH6nROugziO5KsKSQ9TmAXq6HJa8Fn+kDqAL/sNY65w6YYlHifMO2xHkSXVJxGw7vx9DYh/5SF+KnLn6NDNA==
+  dependencies:
+    "@sentry/hub" "7.14.2"
+    "@sentry/types" "7.14.2"
+    "@sentry/utils" "7.14.2"
+    tslib "^1.9.3"
+
+"@sentry/hub@7.14.2":
+  version "7.14.2"
+  resolved "https://registry.yarnpkg.com/@sentry/hub/-/hub-7.14.2.tgz#b7b4d6e5002cd5abe9a829a84db5f4270689c666"
+  integrity sha512-18cuSesTn9VAF0JC107flLmtCRt/6DBn38uz0G9cPThKtTSNwjGvGZ/ag4J1iq+IDjVS5MA6iTncXOsSpVP2Wg==
+  dependencies:
+    "@sentry/types" "7.14.2"
+    "@sentry/utils" "7.14.2"
+    tslib "^1.9.3"
+
+"@sentry/types@7.14.2":
+  version "7.14.2"
+  resolved "https://registry.yarnpkg.com/@sentry/types/-/types-7.14.2.tgz#78e2e2632d1ee10092549ba32efbe2bc288cbf6f"
+  integrity sha512-JzkOtenArOXmJBAk/FBbxKKX7XC650HqkhGL4ugT/f+RyxfiDZ0X1TAYMrvKIe+qpn5Nh7JUBfR+BARKAiu2wQ==
+
+"@sentry/utils@7.14.2":
+  version "7.14.2"
+  resolved "https://registry.yarnpkg.com/@sentry/utils/-/utils-7.14.2.tgz#5af245fc2d72211490cb9aeaf2098e048739120a"
+  integrity sha512-vpZolN+k1IoxWXhKyOVcRl7V1bgww+96gHqTJdcMzOB83x/ofels7L0kqxb03WukKTYcnc7Ep+yBiKi/OYX9og==
+  dependencies:
+    "@sentry/types" "7.14.2"
+    tslib "^1.9.3"
+
 "@tauri-apps/api@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@tauri-apps/api/-/api-1.1.0.tgz#2c5756f6aeecd36f7683183eaba021690711bedf"
@@ -77,8 +119,12 @@
     "@tauri-apps/cli-win32-ia32-msvc" "1.1.1"
     "@tauri-apps/cli-win32-x64-msvc" "1.1.1"
 
-"@timfish/sentry-tauri@../../../":
-  version "0.0.0"
+"@timfish/sentry-tauri@../../":
+  version "0.1.0"
+  dependencies:
+    "@sentry/browser" "^7.2.0"
+    "@tauri-apps/api" "^1.1.0"
+    tslib "^2.4.0"
 
 esbuild-android-64@0.15.10:
   version "0.15.10"
@@ -281,6 +327,16 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+tslib@^1.9.3:
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
+  integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
+
+tslib@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.0.tgz#7cecaa7f073ce680a05847aa77be941098f36dc3"
+  integrity sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==
 
 typescript@^4.8.2:
   version "4.8.4"

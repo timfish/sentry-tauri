@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api';
-import * as Sentry from '../../../'
+import * as Sentry from '@timfish/sentry-tauri'
 
 Sentry.init()
 
