@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-export function init(options?: BrowserOptions): void {
+export function init(options?: BrowserOptions): void {  
   SentryInit({
     ...window.__SENTRY_INIT__,
     // We don't want to track browser sessions
@@ -19,3 +19,5 @@ export function init(options?: BrowserOptions): void {
     ...options,
   });
 }
+
+export * from "@sentry/browser"

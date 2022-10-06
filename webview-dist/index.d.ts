@@ -1,4 +1,5 @@
 import { BrowserOptions } from '@sentry/browser';
+export * from '@sentry/browser';
 
 declare global {
     interface Window {
