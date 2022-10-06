@@ -6,12 +6,12 @@
   "files": [
     "webview-dist"
   ],
-  "module": "./webview-dist/index.mjs",
-  "types": "./webview-dist/index.d.ts",
+  "type": "module",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "import": "./webview-dist/index.mjs",
+      "main": "./webview-dist/index.js",
+      "import": "./webview-dist/index.js",
       "types": "./webview-dist/index.d.ts"
     }
   },
