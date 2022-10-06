@@ -1,43 +1,35 @@
-import { getCurrentHub } from "@sentry/core";
-import { invoke } from "@tauri-apps/api/tauri";
-import { Event, EventProcessor, Integration } from "@sentry/types";
+import { BrowserOptions, init as SentryInit } from "@sentry/browser";
+import { Integration } from "@sentry/types";
+import {TauriIntegration} from './integration'
 
-export class TauriIntegration implements Integration {
-  public static id: string = "TauriIntegration";
-
-  public name: string = TauriIntegration.id;
-
-  public setupOnce(
-    addGlobalEventProcessor: (callback: EventProcessor) => void
-  ): void {
-    // Intercept events and sends them to Rust
-    addGlobalEventProcessor(async (event: Event) => {
-      // The Sentry Rust type de-serialisation doesn't like these in their
-      // current state
-      delete event.sdk;
-      delete event.breadcrumbs;
-      // These will be overridden in the host
-      delete event.environment;
-      // This isn't in the Rust types
-      delete event.sdkProcessingMetadata;
-
-      await invoke("plugin:sentry|event", { event });
-
-      // Stop events from being sent from the browser
-      return null;
-    });
-
-    // Intercept global scope updates and send breadcrumbs to Rust
-    const scope = getCurrentHub().getScope();
-    if (scope) {
-      scope.addScopeListener(async (updatedScope) => {
-        // _breadcrumbs is private
-        for (const breadcrumb of (updatedScope as any)._breadcrumbs) {
-          await invoke("plugin:sentry|breadcrumb", { breadcrumb });
-        }
-        // Clear so we don't send these again
-        updatedScope.clearBreadcrumbs();
-      });
-    }
+declare global {
+  interface Window {
+    __SENTRY_DEBUG__: boolean
   }
 }
+
+export function init(options?: BrowserOptions): void {
+  let opts: BrowserOptions & { integrations: Integration[] } = {
+    // We don't send from the browser but a DSN is required for the SDK to work
+    dsn: "https://123456@dummy.dsn/0",
+    // We don't want to track browser sessions
+    autoSessionTracking: false,
+    // We replace this with true or false before injecting this code into the browser
+    debug: window.__SENTRY_DEBUG__,
+  
+    ...options,
+
+    // whatever the user configures, the Tauri integration must alway be set
+    integrations: [new TauriIntegration()]
+  }
+
+  if (typeof options?.integrations === "function") {
+    opts.integrations.push(...options.integrations(opts.integrations))
+  } else if (!!options?.integrations) {
+    opts.integrations.push(...opts.integrations)
+  }
+
+  SentryInit(opts);
+}
+
+export * from "@sentry/browser"

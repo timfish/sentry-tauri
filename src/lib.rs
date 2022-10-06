@@ -1,19 +1,20 @@
-mod options;
 mod plugin;
 
-pub fn init<Runtime, IntoOpt, SentryInitFn, RunAppFn>(
-    options: IntoOpt,
-    init_sentry: SentryInitFn,
-    run_app: RunAppFn,
-) where
-    Runtime: tauri::Runtime,
-    IntoOpt: Into<options::Options>,
-    SentryInitFn: FnOnce(bool) -> sentry::ClientInitGuard,
-    RunAppFn: FnOnce(tauri::plugin::TauriPlugin<Runtime>),
+pub fn init<'a, R, SentryInitFn, RunAppFn>(init_sentry: SentryInitFn, run_app: RunAppFn)
+where
+  R: tauri::Runtime,
+  SentryInitFn: FnOnce(bool) -> sentry::ClientInitGuard,
+  RunAppFn: FnOnce(tauri::plugin::TauriPlugin<R>),
 {
-    let options = options.into();
+  let sentry = init_sentry(false);
 
-    sentry_rust_minidump::init(Some(&options.release), init_sentry, || {
-        run_app(plugin::build(&options));
-    })
+  let options = sentry.options().clone();
+
+  sentry_rust_minidump::init(
+    options.release.clone(),
+    |_| sentry,
+    || {
+      run_app(plugin::init(options));
+    },
+  )
 }

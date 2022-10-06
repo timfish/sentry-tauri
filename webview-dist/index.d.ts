@@ -1,6 +1,11 @@
-import { EventProcessor, Integration } from "@sentry/types";
-export declare class TauriIntegration implements Integration {
-    static id: string;
-    name: string;
-    setupOnce(addGlobalEventProcessor: (callback: EventProcessor) => void): void;
+import { BrowserOptions } from '@sentry/browser';
+export * from '@sentry/browser';
+
+declare global {
+    interface Window {
+        __SENTRY_DEBUG__: boolean;
+    }
 }
+declare function init(options?: BrowserOptions): void;
+
+export { init };
