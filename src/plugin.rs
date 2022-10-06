@@ -34,8 +34,6 @@ impl<'a> From<ClientOptions> for JavaScriptInit<'a> {
 }
 
 pub fn init<R: Runtime>(options: sentry::ClientOptions) -> TauriPlugin<R> {
-  let mut plugin_builder = plugin::Builder::new("sentry");
-
   let js_init = JavaScriptInit::from(options);
 
   let js_init_script = format!(
@@ -43,7 +41,7 @@ pub fn init<R: Runtime>(options: sentry::ClientOptions) -> TauriPlugin<R> {
     serde_json::to_string(&js_init).unwrap()
   );
 
-  plugin_builder = plugin_builder.js_init_script(js_init_script);
-
-  plugin_builder.build()
+  plugin::Builder::new("sentry")
+    .js_init_script(js_init_script)
+    .build()
 }
