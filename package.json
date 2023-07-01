@@ -6,24 +6,25 @@
   "files": [
     "webview-dist"
   ],
-  "main": "./webview-dist/index.js",
-  "types": "./webview-dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc --project ./webview-src/tsconfig.json && rollup -c ./webview-src/rollup.config.js",
+    "build": "yarn build:ts && yarn build:rust",
+    "build:ts": "tsc --project ./js/tsconfig.json && rollup -c ./js/rollup.config.js",
+    "build:rust": "cargo build",
+    "example": "cd examples/basic-app && yarn && yarn tauri dev",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13.3.0",
-    "@rollup/plugin-typescript": "8.3.3",
-    "@sentry/browser": "^7.2.0",
-    "@sentry/core": "^7.2.0",
-    "@sentry/types": "^7.2.0",
+    "@sentry/browser": "^7.57.0",
+    "@sentry/types": "^7.57.0",
     "rollup": "2.75.7",
     "rollup-plugin-terser": "7.0.2",
-    "typescript": "^4.7.4"
+    "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@tauri-apps/api": "^1.0.1",
-    "tslib": "^2.4.0"
+    "@tauri-apps/api": "^1.4.0",
+    "tslib": "^2.6.0"
   }
 }

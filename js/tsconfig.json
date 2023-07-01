@@ -16,10 +16,13 @@
     // advanced
     "skipLibCheck": true,
     "rootDir": "./",
-    "outDir": "../webview-dist/",
+    "outDir": "../dist/",
     "declaration": true
   },
   "exclude": [
     "node_modules"
+  ],
+  "include": [
+    "./**/*"
   ]
 }
