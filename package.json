@@ -17,8 +17,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13.3.0",
-    "@sentry/browser": "^7.57.0",
-    "@sentry/types": "^7.57.0",
+    "@sentry/browser": "^7.111.0",
+    "@sentry/types": "^7.111.0",
     "rollup": "2.75.7",
     "rollup-plugin-terser": "7.0.2",
     "typescript": "^5.1.6"
