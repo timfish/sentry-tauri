@@ -2,15 +2,21 @@
 description = "An experimental Tauri Plugin for Sentry"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-name = "sentry-tauri"
+name = "tauri-plugin-sentry"
 readme = "README.md"
 repository = "https://github.com/timfish/sentry-tauri"
 version = "0.3.0"
+links = "tauri-plugin-sentry"
+exclude = ["/examples", "/node_modules", "/target"]
 
 [dependencies]
 base64 = "0.22"
 sentry = "0.32"
 sentry-rust-minidump = "0.7"
 serde = "1"
-tauri = "1"
+tauri = "2.0.0-beta"
 thiserror = "1"
+schemars = "0.8"
+
+[build-dependencies]
+tauri-plugin = { version = "2.0.0-beta", features = ["build"] }

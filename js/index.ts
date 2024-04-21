@@ -1,5 +1,5 @@
 import { BrowserOptions } from "@sentry/browser";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { Breadcrumb, Event } from "@sentry/types";
 
 /**

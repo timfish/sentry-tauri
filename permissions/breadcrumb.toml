@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "allow-breadcrumb"
+description = "Enables the breadcrumb command."
+commands.allow = ["breadcrumb"]
+
+[[permission]]
+identifier = "deny-breadcrumb"
+description = "Denies the breadcrumb command."
+commands.deny = ["breadcrumb"]

@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 /**
  * A simple `beforeSend` that sends the envelope to the Rust process via Tauri invoke.
  */
