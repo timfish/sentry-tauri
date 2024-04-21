@@ -62,19 +62,19 @@
         window.document
           .getElementById("rust-breadcrumb")
           .addEventListener("click", () => {
-            window.__TAURI__.invoke("rust_breadcrumb");
+            window.__TAURI__.core.invoke("rust_breadcrumb");
           });
 
         window.document
           .getElementById("rust-panic")
           .addEventListener("click", () => {
-            window.__TAURI__.invoke("rust_panic");
+            window.__TAURI__.core.invoke("rust_panic");
           });
 
         window.document
           .getElementById("native-crash")
           .addEventListener("click", () => {
-            window.__TAURI__.invoke("native_crash");
+            window.__TAURI__.core.invoke("native_crash");
           });
       });
     </script>
