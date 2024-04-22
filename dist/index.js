@@ -24,8 +24,8 @@ export async function sendEventToRust(event) {
  * A simple `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
 export function sendBreadcrumbToRust(breadcrumb) {
-    var _a;
-    if ((_a = breadcrumb.data) === null || _a === void 0 ? void 0 : _a.url.startsWith("http://ipc.localhost/"))
+    var _a, _b;
+    if ((_b = (_a = breadcrumb.data) === null || _a === void 0 ? void 0 : _a.url) === null || _b === void 0 ? void 0 : _b.startsWith("http://ipc.localhost/"))
         return null;
     invoke("plugin:sentry|breadcrumb", { breadcrumb });
     // We don't collect breadcrumbs in the renderer since they are passed to Rust
