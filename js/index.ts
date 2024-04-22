@@ -32,6 +32,8 @@ export async function sendEventToRust(event: Event): Promise<Error | null> {
 export function sendBreadcrumbToRust(
   breadcrumb: Breadcrumb
 ): Breadcrumb | null {
+  if (breadcrumb.data?.url.startsWith("http://ipc.localhost/")) return null
+
   invoke("plugin:sentry|breadcrumb", { breadcrumb });
   // We don't collect breadcrumbs in the renderer since they are passed to Rust
   return null;
