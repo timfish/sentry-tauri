@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "allow-event"
+description = "Enables the event command."
+commands.allow = ["event"]
+
+[[permission]]
+identifier = "deny-event"
+description = "Denies the event command."
+commands.deny = ["event"]

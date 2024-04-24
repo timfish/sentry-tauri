@@ -9,19 +9,15 @@ repository = ""
 version = "0.1.0"
 
 [build-dependencies]
-tauri-build = {version = "1.0.0", features = [] }
+tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
 sadness-generator = "0.5"
-sentry-tauri = {path = "../../../"}
-serde = {version = "1.0", features = ["derive"] }
+tauri-plugin-sentry = { path = "../../.." }
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tauri = {version = "1", features = ["api-all"] }
+tauri = { version = "2.0.0-beta", features = [] }
 
-[features]
-# by default Tauri runs in production mode
-# when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
-default = ["custom-protocol"]
-# this feature is used used for production builds where `devPath` points to the filesystem
-# DO NOT remove this
-custom-protocol = ["tauri/custom-protocol"]
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib", "lib"]
