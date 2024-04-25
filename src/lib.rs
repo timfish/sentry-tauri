@@ -10,8 +10,8 @@ pub use sentry_rust_minidump as minidump;
 
 #[derive(Debug, Clone)]
 pub struct JavaScriptOptions {
-    inject: bool,
-    debug: bool,
+    pub inject: bool,
+    pub debug: bool,
 }
 
 impl Default for JavaScriptOptions {
