@@ -9,8 +9,17 @@ pub use sentry_rust_minidump as minidump;
 
 #[derive(Debug, Clone)]
 pub struct JavaScriptOptions {
-    inject: bool,
-    debug: bool,
+    pub inject: bool,
+    pub debug: bool,
+}
+
+impl JavaScriptOptions {
+    pub fn no_injection() -> Self {
+        Self {
+            inject: false,
+            ..Default::default()
+        }
+    }
 }
 
 impl Default for JavaScriptOptions {
@@ -48,4 +57,10 @@ pub fn init_with_options<R: Runtime>(options: Options) -> TauriPlugin<R> {
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     init_with_options(Default::default())
+}
+
+pub fn init_with_no_injection<R: Runtime>() -> TauriPlugin<R> {
+    init_with_options(Options {
+        javascript: JavaScriptOptions::no_injection(),
+    })
 }

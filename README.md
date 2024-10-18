@@ -1,6 +1,6 @@
 # `sentry-tauri`
 
-A Tauri Plugin for improved Sentry support.
+A Sentry plugin for Tauri v2.
 
 It's perfectly reasonable to use Sentry's Rust and browser SDKs separately in a
 Tauri app. However, this plugin passes browser breadcrumbs and events through 
@@ -29,10 +29,10 @@ tauri-plugin-sentry = { git = "https://github.com/timfish/sentry-tauri", branch 
 don't need to add them as dependencies.
 
 Run one of these commands to add the capabilities:
-- npm: `npm run tauri add autostart`
-- yarn: `yarn run tauri add autostart`
-- pnpm: `pnpm tauri add autostart`
-- cargo: `cargo tauri add autostart`
+- npm: `npm run tauri add sentry`
+- yarn: `yarn run tauri add sentry`
+- pnpm: `pnpm tauri add sentry`
+- cargo: `cargo tauri add sentry`
 
 however, make sure that you have `sentry:default` in your capabilities:
 
@@ -78,10 +78,37 @@ pub fn run() {
 
 ## The Plugin
 
-- Injects and initialises `@sentry/browser` in every web-view
+- By default injects and initialises `@sentry/browser` in every web-view
 - Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and breadcrumbs and passes
   them to the Rust SDK via the Tauri `invoke` API
-- Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just Works™️
+- Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
+  Works™️
+
+## Custom Sentry Browser Configuration
+
+By default the plugin injects a pre-minified version of `@sentry/browser`. If
+you want to configure Sentry in the browser yourself, you can disable the
+injection and pass the default config to `Sentry.init`.
+
+Disable automatic injection:
+```rust
+tauri::Builder::default()
+    .plugin(tauri_plugin_sentry::init_with_no_injection())
+    .run(tauri::generate_context!())
+    .expect("error while running tauri app");
+```
+
+```ts
+import { defaultOptions } from 'tauri-plugin-sentry-api';
+import * as Sentry from '@sentry/browser';
+
+Sentry.init({
+  ...defaultOptions,
+  /**
+   * Your custom configuration here
+   */
+});
+```
 
 ## Example App
 
