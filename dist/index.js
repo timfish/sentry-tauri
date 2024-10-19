@@ -1,30 +1,21 @@
+import { createTransport } from "@sentry/browser";
 import { invoke } from "@tauri-apps/api/core";
 /**
- * A simple `beforeSend` that sends the envelope to the Rust process via Tauri invoke.
+ * Creates a Transport that passes envelopes to the Tauri Rust process.
  */
-export function sendEventToRust(event) {
-    var _a, _b;
-    // The Sentry Rust type de-serialisation doesn't like these in their
-    // current state
-    delete event.sdk;
-    delete event.breadcrumbs;
-    // These will be overridden in the host
-    delete event.environment;
-    // This isn't in the Rust types
-    delete event.sdkProcessingMetadata;
-    // We delete the user agent header so Sentry doesn't display guess weird browsers
-    if ((_b = (_a = event === null || event === void 0 ? void 0 : event.request) === null || _a === void 0 ? void 0 : _a.headers) === null || _b === void 0 ? void 0 : _b["User-Agent"]) {
-        delete event.request.headers["User-Agent"];
-    }
-    invoke("plugin:sentry|event", { event });
-    // Stop events from being sent from the browser
-    return null;
+export function makeRendererTransport(options) {
+    return createTransport(options, async (request) => {
+        invoke("plugin:sentry|envelope", { envelope: request.body });
+        // Since the Rust process handles sending of envelopes and rate limiting, we always return 200 OK to the renderers.
+        return { statusCode: 200 };
+    });
 }
 /**
- * A simple `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
+ * A `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
 export function sendBreadcrumbToRust(breadcrumb) {
     var _a;
+    // Ignore IPC breadcrumbs otherwise we'll make an infinite loop
     if (typeof ((_a = breadcrumb.data) === null || _a === void 0 ? void 0 : _a.url) === "string" &&
         breadcrumb.data.url.startsWith("ipc://")) {
         return null;
@@ -42,6 +33,6 @@ export const defaultOptions = {
     dsn: "https://123456@dummy.dsn/0",
     // We want to track app sessions rather than browser sessions
     autoSessionTracking: false,
-    beforeSend: sendEventToRust,
+    transport: makeRendererTransport,
     beforeBreadcrumb: sendBreadcrumbToRust,
 };

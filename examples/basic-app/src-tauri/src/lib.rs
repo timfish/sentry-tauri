@@ -37,7 +37,7 @@ pub fn run() {
     let _guard = minidump::init(&client);
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sentry::init())
+        .plugin(tauri_plugin_sentry::init(&client))
         .invoke_handler(tauri::generate_handler![
             rust_breadcrumb,
             rust_panic,

@@ -325,19 +325,19 @@
           "const": "deny-breadcrumb"
         },
         {
-          "description": "Allows all required permissions (event, breadcrumb)",
+          "description": "Allows all required permissions (envelope, breadcrumb)",
           "type": "string",
           "const": "default"
         },
         {
-          "description": "Enables the event command.",
+          "description": "Enables the envelope command.",
           "type": "string",
-          "const": "allow-event"
+          "const": "allow-envelope"
         },
         {
-          "description": "Denies the event command.",
+          "description": "Denies the envelope command.",
           "type": "string",
-          "const": "deny-event"
+          "const": "deny-envelope"
         }
       ]
     }
