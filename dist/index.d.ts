@@ -1,11 +1,11 @@
-import { BrowserOptions } from "@sentry/browser";
-import { Breadcrumb, Event } from "@sentry/types";
+import { type BrowserOptions } from "@sentry/browser";
+import type { BaseTransportOptions, Breadcrumb, Transport } from "@sentry/types";
 /**
- * A simple `beforeSend` that sends the envelope to the Rust process via Tauri invoke.
+ * Creates a Transport that passes envelopes to the Tauri Rust process.
  */
-export declare function sendEventToRust(event: Event): null;
+export declare function makeRendererTransport(options: BaseTransportOptions): Transport;
 /**
- * A simple `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
+ * A `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
 export declare function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null;
 /**

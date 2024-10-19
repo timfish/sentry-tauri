@@ -3,7 +3,7 @@
 A Sentry plugin for Tauri v2.
 
 It's perfectly reasonable to use Sentry's Rust and browser SDKs separately in a
-Tauri app. However, this plugin passes browser breadcrumbs and events through 
+Tauri app. However, this plugin passes browser breadcrumbs and events through
 the Rust backend which has a number of advantages:
 
 - Browser events are enriched with Rust, OS and device context
@@ -23,7 +23,9 @@ Add `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 [dependencies]
 tauri-plugin-sentry = "0.1"
 ```
+
 Run one of these commands to add the capabilities:
+
 - npm: `npm run tauri add sentry`
 - yarn: `yarn run tauri add sentry`
 - pnpm: `pnpm tauri add sentry`
@@ -32,6 +34,7 @@ Run one of these commands to add the capabilities:
 however, make sure that you have `sentry:default` in your capabilities:
 
 ###### src-tauri/capabilities/*.json
+
 ```json
 {
   "$schema": "./../gen/schemas/windows-schema.json",
@@ -49,9 +52,9 @@ however, make sure that you have `sentry:default` in your capabilities:
 ## Usage
 
 This example also shows usage of
-[`sentry_rust_minidump`](https://github.com/timfish/sentry-rust-minidump) which 
+[`sentry_rust_minidump`](https://github.com/timfish/sentry-rust-minidump) which
 allows you to capture minidumps for native crashes from a separate crash
-reporting process. 
+reporting process.
 
 ```rust
 use tauri_plugin_sentry::{minidump, sentry};
@@ -70,16 +73,17 @@ pub fn run() {
     // Everything after here runs in only the app process
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sentry::init())
+        .plugin(tauri_plugin_sentry::init(&client))
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
 ```
 
 The Plugin:
+
 - By default injects and initialises `@sentry/browser` in every web-view
-- Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and breadcrumbs and passes
-  them to the Rust SDK via the Tauri `invoke` API
+- Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and
+  breadcrumbs and passes them to the Rust SDK via the Tauri `invoke` API
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
   Works™️
 
@@ -90,16 +94,17 @@ you want to configure Sentry in the browser yourself, you can disable the
 injection and pass the default config to `Sentry.init`.
 
 Disable automatic injection:
+
 ```rust
 tauri::Builder::default()
-    .plugin(tauri_plugin_sentry::init_with_no_injection())
+    .plugin(tauri_plugin_sentry::init_with_no_injection(&client))
     .run(tauri::generate_context!())
     .expect("error while running tauri app");
 ```
 
 ```ts
-import { defaultOptions } from 'tauri-plugin-sentry-api';
-import * as Sentry from '@sentry/browser';
+import { defaultOptions } from "tauri-plugin-sentry-api";
+import * as Sentry from "@sentry/browser";
 
 Sentry.init({
   ...defaultOptions,

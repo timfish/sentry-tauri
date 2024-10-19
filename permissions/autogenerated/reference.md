@@ -1,8 +1,8 @@
 ## Default Permission
 
-Allows all required permissions (event, breadcrumb)
+Allows all required permissions (envelope, breadcrumb)
 
-- `allow-event`
+- `allow-envelope`
 - `allow-breadcrumb`
 
 ## Permission Table
@@ -95,12 +95,12 @@ Denies the breadcrumb command.
 <tr>
 <td>
 
-`sentry:allow-event`
+`sentry:allow-envelope`
 
 </td>
 <td>
 
-Enables the event command.
+Enables the envelope command.
 
 </td>
 </tr>
@@ -108,12 +108,12 @@ Enables the event command.
 <tr>
 <td>
 
-`sentry:deny-event`
+`sentry:deny-envelope`
 
 </td>
 <td>
 
-Denies the event command.
+Denies the envelope command.
 
 </td>
 </tr>

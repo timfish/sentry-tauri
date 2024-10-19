@@ -1,45 +1,34 @@
-import { BrowserOptions } from "@sentry/browser";
-import { invoke } from "@tauri-apps/api/core";
-import { Breadcrumb, Event } from "@sentry/types";
+import { type BrowserOptions, createTransport } from '@sentry/browser';
+import { invoke } from '@tauri-apps/api/core';
+import type {
+  BaseTransportOptions,
+  Breadcrumb,
+  Transport,
+  TransportMakeRequestResponse,
+  TransportRequest,
+} from '@sentry/types';
 
 /**
- * A simple `beforeSend` that sends the envelope to the Rust process via Tauri invoke.
+ * Creates a Transport that passes envelopes to the Tauri Rust process.
  */
-export function sendEventToRust(event: Event): null {
-  // The Sentry Rust type de-serialisation doesn't like these in their
-  // current state
-  delete event.sdk;
-  delete event.breadcrumbs;
-  // These will be overridden in the host
-  delete event.environment;
-  // This isn't in the Rust types
-  delete event.sdkProcessingMetadata;
-
-  // We delete the user agent header so Sentry doesn't display guess weird browsers
-  if (event?.request?.headers?.["User-Agent"]) {
-    delete event.request.headers["User-Agent"];
-  }
-
-  invoke("plugin:sentry|event", { event });
-
-  // Stop events from being sent from the browser
-  return null;
+export function makeRendererTransport(options: BaseTransportOptions): Transport {
+  return createTransport(options, async (request: TransportRequest): Promise<TransportMakeRequestResponse> => {
+    invoke('plugin:sentry|envelope', { envelope: request.body });
+    // Since the Rust process handles sending of envelopes and rate limiting, we always return 200 OK to the renderers.
+    return { statusCode: 200 };
+  });
 }
 
 /**
- * A simple `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
+ * A `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
-export function sendBreadcrumbToRust(
-  breadcrumb: Breadcrumb,
-): Breadcrumb | null {
-  if (
-    typeof breadcrumb.data?.url === "string" &&
-    breadcrumb.data.url.startsWith("ipc://")
-  ) {
+export function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null {
+  // Ignore IPC breadcrumbs otherwise we'll make an infinite loop
+  if (typeof breadcrumb.data?.url === 'string' && breadcrumb.data.url.startsWith('ipc://')) {
     return null;
   }
 
-  invoke("plugin:sentry|breadcrumb", { breadcrumb });
+  invoke('plugin:sentry|breadcrumb', { breadcrumb });
   // We don't collect breadcrumbs in the renderer since they are passed to Rust
   return null;
 }
@@ -50,9 +39,9 @@ export function sendBreadcrumbToRust(
  */
 export const defaultOptions: BrowserOptions = {
   // We don't send from the browser but a DSN is required for the SDK to start
-  dsn: "https://123456@dummy.dsn/0",
+  dsn: 'https://123456@dummy.dsn/0',
   // We want to track app sessions rather than browser sessions
   autoSessionTracking: false,
-  beforeSend: sendEventToRust,
+  transport: makeRendererTransport,
   beforeBreadcrumb: sendBreadcrumbToRust,
 };

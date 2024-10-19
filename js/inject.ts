@@ -1,7 +1,7 @@
-import * as Sentry from "@sentry/browser";
-import { defaultOptions } from "./";
+import * as Sentry from '@sentry/browser';
+import { defaultOptions } from './';
 
-declare var __DEBUG__: boolean;
+declare const __DEBUG__: boolean;
 
 declare global {
   interface Window {

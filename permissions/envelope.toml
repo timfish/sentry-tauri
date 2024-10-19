@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "allow-envelope"
+description = "Enables the envelope command."
+commands.allow = ["envelope"]
+
+[[permission]]
+identifier = "deny-envelope"
+description = "Denies the envelope command."
+commands.deny = ["envelope"]

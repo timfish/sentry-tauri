@@ -1,7 +1,7 @@
 use tauri::{
     generate_handler,
     plugin::{Builder, TauriPlugin},
-    Runtime,
+    Manager, Runtime,
 };
 
 pub use sentry;
@@ -41,9 +41,18 @@ pub struct Options {
 
 mod commands;
 
-pub fn init_with_options<R: Runtime>(options: Options) -> TauriPlugin<R> {
+pub fn init_with_options<R: Runtime>(
+    sentry_client: &sentry::Client,
+    options: Options,
+) -> TauriPlugin<R> {
+    let sentry_client = sentry_client.clone();
+
     let mut plugin_builder = Builder::<R>::new("sentry")
-        .invoke_handler(generate_handler![commands::event, commands::breadcrumb]);
+        .invoke_handler(generate_handler![commands::breadcrumb, commands::envelope])
+        .setup(move |app, _| {
+            app.manage(sentry_client);
+            Ok(())
+        });
 
     if options.javascript.inject {
         plugin_builder = plugin_builder.js_init_script(
@@ -55,12 +64,15 @@ pub fn init_with_options<R: Runtime>(options: Options) -> TauriPlugin<R> {
     plugin_builder.build()
 }
 
-pub fn init<R: Runtime>() -> TauriPlugin<R> {
-    init_with_options(Default::default())
+pub fn init<R: Runtime>(sentry_client: &sentry::Client) -> TauriPlugin<R> {
+    init_with_options(sentry_client, Default::default())
 }
 
-pub fn init_with_no_injection<R: Runtime>() -> TauriPlugin<R> {
-    init_with_options(Options {
-        javascript: JavaScriptOptions::no_injection(),
-    })
+pub fn init_with_no_injection<R: Runtime>(sentry_client: &sentry::Client) -> TauriPlugin<R> {
+    init_with_options(
+        sentry_client,
+        Options {
+            javascript: JavaScriptOptions::no_injection(),
+        },
+    )
 }
