@@ -1,9 +1,12 @@
 # `sentry-tauri`
 
-A Tauri Plugin for improved Sentry support.
+A Sentry plugin for Tauri v1.
+
+For the Tauri v2 plugin see
+[`tauri-plugin-sentry`](https://crates.io/crates/tauri-plugin-sentry)
 
 It's perfectly reasonable to use Sentry's Rust and browser SDKs separately in a
-Tauri app. However, this plugin passes browser breadcrumbs and events through 
+Tauri app. However, this plugin passes browser breadcrumbs and events through
 the Rust backend which has a number of advantages:
 
 - Browser events are enriched with Rust, OS and device context
@@ -23,8 +26,9 @@ Add the required dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentry-tauri = "0.2"
+sentry-tauri = "0.3"
 ```
+
 `sentry` and `sentry-rust-minidump` are re-exported by `sentry-tauri` so you
 don't need to add them as dependencies.
 
@@ -52,9 +56,10 @@ fn main() {
 ## The Plugin
 
 - Injects and initialises `@sentry/browser` in every web-view
-- Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and breadcrumbs and passes
-  them to the Rust SDK via the Tauri `invoke` API
-- Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just Works™️
+- Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and
+  breadcrumbs and passes them to the Rust SDK via the Tauri `invoke` API
+- Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
+  Works™️
 
 ## Example App
 
