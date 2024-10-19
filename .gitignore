@@ -2,3 +2,4 @@ target/
 node_modules/
 Cargo.lock
 WixTools/
+examples/basic-app/src-tauri/gen/

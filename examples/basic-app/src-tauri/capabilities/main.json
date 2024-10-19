@@ -1,0 +1,12 @@
+{
+  "$schema": "./../gen/schemas/windows-schema.json",
+  "identifier": "main",
+  "description": "applied permissions for our demo application",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "sentry:default"
+  ]
+}

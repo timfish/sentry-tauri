@@ -1,11 +1,11 @@
 import { BrowserOptions } from "@sentry/browser";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { Breadcrumb, Event } from "@sentry/types";
 
 /**
  * A simple `beforeSend` that sends the envelope to the Rust process via Tauri invoke.
  */
-export async function sendEventToRust(event: Event): Promise<Error | null> {
+export function sendEventToRust(event: Event): null {
   // The Sentry Rust type de-serialisation doesn't like these in their
   // current state
   delete event.sdk;
@@ -20,7 +20,7 @@ export async function sendEventToRust(event: Event): Promise<Error | null> {
     delete event.request.headers["User-Agent"];
   }
 
-  await invoke("plugin:sentry|event", { event });
+  invoke("plugin:sentry|event", { event });
 
   // Stop events from being sent from the browser
   return null;
@@ -30,8 +30,15 @@ export async function sendEventToRust(event: Event): Promise<Error | null> {
  * A simple `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
 export function sendBreadcrumbToRust(
-  breadcrumb: Breadcrumb
+  breadcrumb: Breadcrumb,
 ): Breadcrumb | null {
+  if (
+    typeof breadcrumb.data?.url === "string" &&
+    breadcrumb.data.url.startsWith("ipc://")
+  ) {
+    return null;
+  }
+
   invoke("plugin:sentry|breadcrumb", { breadcrumb });
   // We don't collect breadcrumbs in the renderer since they are passed to Rust
   return null;
