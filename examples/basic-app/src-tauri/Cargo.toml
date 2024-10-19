@@ -20,4 +20,4 @@ tauri = { version = "2", features = [] }
 
 [lib]
 name = "app_lib"
-crate-type = ["staticlib", "cdylib", "rlib", "lib"]
+crate-type = ["staticlib", "cdylib", "rlib"]
