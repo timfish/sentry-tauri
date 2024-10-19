@@ -1,4 +1,4 @@
-# `sentry-tauri`
+# `tauri-plugin-sentry`
 
 A Sentry plugin for Tauri v2.
 
@@ -14,20 +14,15 @@ the Rust backend which has a number of advantages:
 
 ## Installation
 
-This example also shows usage of
-[`sentry_rust_minidump`](https://github.com/timfish/sentry-rust-minidump) which
-allows you to capture minidumps for native crashes from a separate crash
-reporting process.
-
-Add the required dependencies in `Cargo.toml`:
-
-```toml
-[dependencies]
-tauri-plugin-sentry = { git = "https://github.com/timfish/sentry-tauri", branch = "v2" }
-```
 `sentry` and `sentry-rust-minidump` are re-exported by `sentry-tauri` so you
 don't need to add them as dependencies.
 
+Add `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
+
+```toml
+[dependencies]
+tauri-plugin-sentry = "0.1"
+```
 Run one of these commands to add the capabilities:
 - npm: `npm run tauri add sentry`
 - yarn: `yarn run tauri add sentry`
@@ -51,22 +46,27 @@ however, make sure that you have `sentry:default` in your capabilities:
 }
 ```
 
-Also make sure that you are using the `sentry` as the example below. keep in mind that it's just an example and you are free to use the `sentry` package (that is just re-exported from this package) anyway you want.
+## Usage
+
+This example also shows usage of
+[`sentry_rust_minidump`](https://github.com/timfish/sentry-rust-minidump) which 
+allows you to capture minidumps for native crashes from a separate crash
+reporting process. 
 
 ```rust
-// src/lib.rs
+use tauri_plugin_sentry::{minidump, sentry};
 
 pub fn run() {
-    let client = tauri_plugin_sentry::sentry::init((
+    let client = sentry::init((
         "__YOUR_DSN__",
-        tauri_plugin_sentry::sentry::ClientOptions {
-            release: tauri_plugin_sentry::sentry::release_name!(),
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
             ..Default::default()
         },
     ));
 
-    // Everything before here runs in both app and crash reporter processes
-    let _guard = tauri_plugin_sentry::minidump::init(&client);
+    // Caution! Everything before here runs in both app and crash reporter processes
+    let _guard = minidump::init(&client);
     // Everything after here runs in only the app process
 
     tauri::Builder::default()
@@ -76,8 +76,7 @@ pub fn run() {
 }
 ```
 
-## The Plugin
-
+The Plugin:
 - By default injects and initialises `@sentry/browser` in every web-view
 - Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and breadcrumbs and passes
   them to the Rust SDK via the Tauri `invoke` API
