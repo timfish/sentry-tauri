@@ -24,7 +24,7 @@ export function makeRendererTransport(options: BaseTransportOptions): Transport 
  */
 export function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null {
   // Ignore IPC breadcrumbs otherwise we'll make an infinite loop
-  if (typeof breadcrumb.data?.url === 'string' && breadcrumb.data.url.startsWith('ipc://')) {
+  if (typeof breadcrumb.data?.url === 'string' && (breadcrumb.data.url.startsWith('ipc://') || breadcrumb.data.url.startsWith('http://ipc.localhost'))) {
     return null;
   }
 
