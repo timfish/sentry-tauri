@@ -1,3 +1,12 @@
+## v0.3.0
+
+- Update to Sentry v0.35.0
+- Fix IPC check on Windows (#16)
+
+## v0.2.1
+
+- Fix README.md
+
 ## v0.2.0
 
 - Use a transport and pass complete envelopes to the Rust process. This allows

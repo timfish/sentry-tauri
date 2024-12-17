@@ -6,7 +6,7 @@ import type {
   Transport,
   TransportMakeRequestResponse,
   TransportRequest,
-} from '@sentry/types';
+} from '@sentry/core';
 
 /**
  * Creates a Transport that passes envelopes to the Tauri Rust process.
@@ -24,7 +24,10 @@ export function makeRendererTransport(options: BaseTransportOptions): Transport 
  */
 export function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null {
   // Ignore IPC breadcrumbs otherwise we'll make an infinite loop
-  if (typeof breadcrumb.data?.url === 'string' && (breadcrumb.data.url.startsWith('ipc://') || breadcrumb.data.url.startsWith('http://ipc.localhost'))) {
+  if (
+    typeof breadcrumb.data?.url === 'string' &&
+    (breadcrumb.data.url.startsWith('ipc://') || breadcrumb.data.url.startsWith('http://ipc.localhost'))
+  ) {
     return null;
   }
 
