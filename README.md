@@ -7,7 +7,7 @@ Tauri app. However, this plugin passes browser breadcrumbs and events through
 the Rust backend which has a number of advantages:
 
 - Browser events are enriched with Rust, OS and device context
-  - Events from both Rust and browser will have the same context for filtering
+  - Events from both Rust and browser will have the same app and device context
 - Breadcrumbs are merged from both the Rust and browser SDKs
   - See what was happening in the Rust backend and the browser frontend at the
     time of the event
@@ -21,7 +21,7 @@ Add `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
-tauri-plugin-sentry = "0.1"
+tauri-plugin-sentry = "0.3"
 ```
 
 Run one of these commands to add the capabilities:
@@ -64,6 +64,7 @@ pub fn run() {
         "__YOUR_DSN__",
         sentry::ClientOptions {
             release: sentry::release_name!(),
+            auto_session_tracking: true,
             ..Default::default()
         },
     ));
@@ -82,8 +83,8 @@ pub fn run() {
 The Plugin:
 
 - By default injects and initialises `@sentry/browser` in every web-view
-- Includes `beforeSend` and `beforeBreadcrumb` hooks that intercept events and
-  breadcrumbs and passes them to the Rust SDK via the Tauri `invoke` API
+- Includes custom `transport` and `beforeBreadcrumb` hook that passes events and
+  breadcrumbs to the Rust SDK via the Tauri `invoke` API
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
   Works™️
 

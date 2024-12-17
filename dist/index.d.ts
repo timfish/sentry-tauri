@@ -1,5 +1,5 @@
-import { type BrowserOptions } from "@sentry/browser";
-import type { BaseTransportOptions, Breadcrumb, Transport } from "@sentry/types";
+import { type BrowserOptions } from '@sentry/browser';
+import type { BaseTransportOptions, Breadcrumb, Transport } from '@sentry/core';
 /**
  * Creates a Transport that passes envelopes to the Tauri Rust process.
  */

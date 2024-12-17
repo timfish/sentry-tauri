@@ -1,5 +1,5 @@
-import * as Sentry from "@sentry/browser";
-import { defaultOptions } from "./";
+import * as Sentry from '@sentry/browser';
+import { defaultOptions } from './';
 window.Sentry = Sentry;
 Sentry.init({
     ...defaultOptions,
