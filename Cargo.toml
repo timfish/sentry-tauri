@@ -12,11 +12,13 @@ exclude = ["/examples", "/node_modules", "/target"]
 [dependencies]
 base64 = "0.22"
 sentry = "0.35"
-sentry-rust-minidump = "0.9"
 serde = "1"
 tauri = "2"
 thiserror = "2"
 schemars = "0.8"
+
+[target.'cfg(not(target_os = "ios"))'.dependencies]
+sentry-rust-minidump = { version = "0.9" }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }

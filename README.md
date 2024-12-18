@@ -70,6 +70,7 @@ pub fn run() {
     ));
 
     // Caution! Everything before here runs in both app and crash reporter processes
+    #[cfg(not(target_os = "ios"))]
     let _guard = minidump::init(&client);
     // Everything after here runs in only the app process
 
