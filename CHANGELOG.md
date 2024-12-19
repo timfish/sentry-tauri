@@ -1,3 +1,7 @@
+## v0.3.1
+
+- fix: Disable `minidumper` on iOS since it's not compatible (#19)
+
 ## v0.3.0
 
 - Update to Sentry v0.35.0
