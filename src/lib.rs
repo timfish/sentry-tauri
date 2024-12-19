@@ -5,6 +5,7 @@ use tauri::{
 };
 
 pub use sentry;
+#[cfg(not(target_os = "ios"))]
 pub use sentry_rust_minidump as minidump;
 
 #[derive(Debug, Clone)]
