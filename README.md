@@ -21,7 +21,7 @@ Add `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
-tauri-plugin-sentry = "0.3"
+tauri-plugin-sentry = "0.4"
 ```
 
 Run one of these commands to add the capabilities:
