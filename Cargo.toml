@@ -5,7 +5,7 @@ license = "MIT OR Apache-2.0"
 name = "tauri-plugin-sentry"
 readme = "README.md"
 repository = "https://github.com/timfish/sentry-tauri"
-version = "0.3.1"
+version = "0.4.0"
 links = "tauri-plugin-sentry"
 exclude = ["/examples", "/node_modules", "/target"]
 
@@ -23,14 +23,14 @@ transport = ["sentry/transport"]
 
 [dependencies]
 base64 = "0.22"
-sentry = { version = "0.35", default-features = false }
+sentry = { version = "0.36", default-features = false }
 serde = "1"
 tauri = "2"
 thiserror = "2"
 schemars = "0.8"
 
 [target.'cfg(not(target_os = "ios"))'.dependencies]
-sentry-rust-minidump = { version = "0.9" }
+sentry-rust-minidump = { version = "0.10" }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }
