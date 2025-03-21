@@ -11,15 +11,37 @@ exclude = ["/examples", "/node_modules", "/target"]
 
 [features]
 default = ["sentry/default"]
-anyhow = ["sentry/anyhow"]
+
 backtrace = ["sentry/backtrace"]
 contexts = ["sentry/contexts"]
-debug-images = ["sentry/debug-images"]
-native-tls = ["sentry/native-tls"]
 panic = ["sentry/panic"]
-reqwest = ["sentry/reqwest"]
+
+# other integrations
+anyhow = ["sentry/anyhow"]
+debug-images = ["sentry/debug-images"]
+log = ["sentry/log"]
+slog = ["sentry/slog"]
+tower = ["sentry/tower"]
+tower-http = ["sentry/tower-http"]
+tower-axum-matched-path = ["sentry/tower-axum-matched-path"]
 tracing = ["sentry/tracing"]
+
+# other features
+test = ["sentry/test"]
+debug-logs = ["sentry/debug-logs"]
+
+# transports
 transport = ["sentry/transport"]
+reqwest = ["sentry/reqwest"]
+curl = ["sentry/curl"]
+surf-h1 = ["sentry/surf-h1"]
+surf = ["sentry/surf"]
+ureq = ["sentry/ureq"]
+
+# transport settings
+native-tls = ["sentry/native-tls"]
+rustls = ["sentry/rustls"]
+embedded-svc-http = ["sentry/embedded-svc-http"]
 
 [dependencies]
 base64 = "0.22"
