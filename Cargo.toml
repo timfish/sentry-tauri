@@ -10,7 +10,8 @@ links = "tauri-plugin-sentry"
 exclude = ["/examples", "/node_modules", "/target"]
 
 [features]
-default = ["sentry/default"]
+default = ["sentry/default", "minidump"]
+minidump = ["sentry-rust-minidump"]
 
 backtrace = ["sentry/backtrace"]
 contexts = ["sentry/contexts"]
@@ -52,7 +53,7 @@ thiserror = "2"
 schemars = "0.8"
 
 [target.'cfg(not(target_os = "ios"))'.dependencies]
-sentry-rust-minidump = { version = "0.10" }
+sentry-rust-minidump = { version = "0.10", optional = true}
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }
