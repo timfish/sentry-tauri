@@ -13,12 +13,14 @@ exclude = ["/examples", "/node_modules", "/target"]
 default = ["sentry/default", "minidump"]
 minidump = ["sentry-rust-minidump"]
 
+# default integrations
 backtrace = ["sentry/backtrace"]
 contexts = ["sentry/contexts"]
 panic = ["sentry/panic"]
 
 # other integrations
 anyhow = ["sentry/anyhow"]
+actix = ["sentry/actix"]
 debug-images = ["sentry/debug-images"]
 log = ["sentry/log"]
 slog = ["sentry/slog"]
@@ -26,17 +28,17 @@ tower = ["sentry/tower"]
 tower-http = ["sentry/tower-http"]
 tower-axum-matched-path = ["sentry/tower-axum-matched-path"]
 tracing = ["sentry/tracing"]
+opentelemetry = ["sentry/opentelemetry"]
 
 # other features
 test = ["sentry/test"]
 debug-logs = ["sentry/debug-logs"]
+release-health = ["sentry/release-health"]
 
 # transports
 transport = ["sentry/transport"]
 reqwest = ["sentry/reqwest"]
 curl = ["sentry/curl"]
-surf-h1 = ["sentry/surf-h1"]
-surf = ["sentry/surf"]
 ureq = ["sentry/ureq"]
 
 # transport settings
@@ -46,14 +48,14 @@ embedded-svc-http = ["sentry/embedded-svc-http"]
 
 [dependencies]
 base64 = "0.22"
-sentry = { version = "0.36", default-features = false }
+sentry = { version = "0.38", default-features = false }
 serde = "1"
 tauri = "2"
 thiserror = "2"
 schemars = "0.8"
 
 [target.'cfg(not(target_os = "ios"))'.dependencies]
-sentry-rust-minidump = { version = "0.10", optional = true}
+sentry-rust-minidump = { version = "0.10", optional = true }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }
