@@ -38,11 +38,10 @@ pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
             // to the scope when we capture the event.
             let attachments = envelope
                 .items()
-                .map(|item| match item {
+                .filter_map(|item| match item {
                     EnvelopeItem::Attachment(attachment) => Some(attachment.clone()),
                     _ => None,
                 })
-                .flatten()
                 .collect::<Vec<_>>();
 
             sentry::with_scope(

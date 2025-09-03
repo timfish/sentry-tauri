@@ -3,7 +3,8 @@
     windows_subsystem = "windows"
 )]
 
-use tauri_plugin_sentry::{minidump, sentry};
+use sentry;
+use tauri_plugin_sentry;
 
 #[tauri::command]
 fn rust_breadcrumb() {
@@ -34,7 +35,7 @@ pub fn run() {
         },
     ));
 
-    let _guard = minidump::init(&client);
+    let _guard = tauri_plugin_sentry::minidump::init(&client);
 
     tauri::Builder::default()
         .plugin(tauri_plugin_sentry::init(&client))

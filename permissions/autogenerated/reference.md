@@ -2,6 +2,8 @@
 
 Allows all required permissions (envelope, breadcrumb)
 
+#### This default permission set includes the following:
+
 - `allow-envelope`
 - `allow-breadcrumb`
 

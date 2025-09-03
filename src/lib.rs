@@ -4,7 +4,6 @@ use tauri::{
     Manager, Runtime,
 };
 
-pub use sentry;
 #[cfg(all(not(target_os = "ios"), feature = "minidump"))]
 pub use sentry_rust_minidump as minidump;
 
@@ -60,7 +59,7 @@ pub fn init_with_options<R: Runtime>(
             include_str!("../dist/inject.min.js")
                 .replace("__DEBUG__", &format!("{}", options.javascript.debug)),
         );
-    };
+    }
 
     plugin_builder.build()
 }

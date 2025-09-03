@@ -5,55 +5,24 @@ license = "MIT OR Apache-2.0"
 name = "tauri-plugin-sentry"
 readme = "README.md"
 repository = "https://github.com/timfish/sentry-tauri"
-version = "0.4.1"
+version = "0.5.0"
 links = "tauri-plugin-sentry"
 exclude = ["/examples", "/node_modules", "/target"]
 
 [features]
-default = ["sentry/default", "minidump"]
+default = ["minidump"]
 minidump = ["sentry-rust-minidump"]
-
-backtrace = ["sentry/backtrace"]
-contexts = ["sentry/contexts"]
-panic = ["sentry/panic"]
-
-# other integrations
-anyhow = ["sentry/anyhow"]
-debug-images = ["sentry/debug-images"]
-log = ["sentry/log"]
-slog = ["sentry/slog"]
-tower = ["sentry/tower"]
-tower-http = ["sentry/tower-http"]
-tower-axum-matched-path = ["sentry/tower-axum-matched-path"]
-tracing = ["sentry/tracing"]
-
-# other features
-test = ["sentry/test"]
-debug-logs = ["sentry/debug-logs"]
-
-# transports
-transport = ["sentry/transport"]
-reqwest = ["sentry/reqwest"]
-curl = ["sentry/curl"]
-surf-h1 = ["sentry/surf-h1"]
-surf = ["sentry/surf"]
-ureq = ["sentry/ureq"]
-
-# transport settings
-native-tls = ["sentry/native-tls"]
-rustls = ["sentry/rustls"]
-embedded-svc-http = ["sentry/embedded-svc-http"]
 
 [dependencies]
 base64 = "0.22"
-sentry = { version = "0.36", default-features = false }
+sentry = { version = "0.42", default-features = false }
 serde = "1"
 tauri = "2"
 thiserror = "2"
 schemars = "0.8"
 
 [target.'cfg(not(target_os = "ios"))'.dependencies]
-sentry-rust-minidump = { version = "0.10", optional = true}
+sentry-rust-minidump = { version = "0.13", optional = true }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }

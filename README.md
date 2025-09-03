@@ -14,14 +14,15 @@ the Rust backend which has a number of advantages:
 
 ## Installation
 
-`sentry` and `sentry-rust-minidump` are re-exported by `sentry-tauri` so you
-don't need to add them as dependencies.
+`sentry-rust-minidump` is re-exported by `sentry-tauri` so you don't need to add
+it as dependencies.
 
-Add `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
+Add `sentry` and `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
-tauri-plugin-sentry = "0.4"
+sentry = "0.42"
+tauri-plugin-sentry = "0.5"
 ```
 
 Run one of these commands to add the capabilities:
@@ -57,7 +58,8 @@ allows you to capture minidumps for native crashes from a separate crash
 reporting process.
 
 ```rust
-use tauri_plugin_sentry::{minidump, sentry};
+use sentry;
+use tauri_plugin_sentry;
 
 pub fn run() {
     let client = sentry::init((
@@ -71,7 +73,7 @@ pub fn run() {
 
     // Caution! Everything before here runs in both app and crash reporter processes
     #[cfg(not(target_os = "ios"))]
-    let _guard = minidump::init(&client);
+    let _guard = tauri_plugin_sentry::minidump::init(&client);
     // Everything after here runs in only the app process
 
     tauri::Builder::default()

@@ -1,3 +1,12 @@
+## v0.5.0
+
+- feat: Update `sentry` to v0.42 and `sentry-rust-minidump` to v0.13
+- feat: Stop re-exporting `sentry` from `tauri-plugin-sentry`
+
+## v0.4.0
+
+- fix: Don't capture breadcrumbs for IPC messages because this results in infinite loops.
+
 ## v0.3.1
 
 - fix: Disable `minidumper` on iOS since it's not compatible (#19)

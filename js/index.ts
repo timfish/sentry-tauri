@@ -66,7 +66,7 @@ export const defaultOptions: BrowserOptions = {
   // We don't send from the browser but a DSN is required for the SDK to start
   dsn: 'https://123456@dummy.dsn/0',
   // We want to track app sessions rather than browser sessions
-  autoSessionTracking: false,
+  integrations: (integrations) => integrations.filter((i) => i.name !== 'BrowserSession'),
   transport: makeRendererTransport,
   beforeBreadcrumb: sendBreadcrumbToRust,
 };
