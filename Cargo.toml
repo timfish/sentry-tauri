@@ -17,7 +17,7 @@ minidump = ["sentry-rust-minidump"]
 base64 = "0.22"
 sentry = { version = "0.42", default-features = false }
 serde = "1"
-tauri = "2"
+tauri = { version = "2", default-features = false }
 thiserror = "2"
 schemars = "0.8"
 
