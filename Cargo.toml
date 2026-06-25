@@ -15,14 +15,14 @@ minidump = ["sentry-rust-minidump"]
 
 [dependencies]
 base64 = "0.22"
-sentry = { version = "0.42", default-features = false }
+sentry = { version = "0.48", default-features = false }
 serde = "1"
 tauri = { version = "2", default-features = false }
 thiserror = "2"
 schemars = "0.8"
 
 [target.'cfg(not(target_os = "ios"))'.dependencies]
-sentry-rust-minidump = { version = "0.13", optional = true }
+sentry-rust-minidump = { version = "0.16", optional = true }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }
