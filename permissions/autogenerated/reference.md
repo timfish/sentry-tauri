@@ -45,12 +45,12 @@ Denies the breadcrumb command without any pre-configured scope.
 <tr>
 <td>
 
-`sentry:allow-event`
+`sentry:allow-envelope`
 
 </td>
 <td>
 
-Enables the event command without any pre-configured scope.
+Enables the envelope command without any pre-configured scope.
 
 </td>
 </tr>
@@ -58,12 +58,12 @@ Enables the event command without any pre-configured scope.
 <tr>
 <td>
 
-`sentry:deny-event`
+`sentry:deny-envelope`
 
 </td>
 <td>
 
-Denies the event command without any pre-configured scope.
+Denies the envelope command without any pre-configured scope.
 
 </td>
 </tr>

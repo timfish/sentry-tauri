@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-envelope"
+description = "Enables the envelope command without any pre-configured scope."
+commands.allow = ["envelope"]
+
+[[permission]]
+identifier = "deny-envelope"
+description = "Denies the envelope command without any pre-configured scope."
+commands.deny = ["envelope"]

@@ -307,16 +307,16 @@
           "markdownDescription": "Denies the breadcrumb command without any pre-configured scope."
         },
         {
-          "description": "Enables the event command without any pre-configured scope.",
+          "description": "Enables the envelope command without any pre-configured scope.",
           "type": "string",
-          "const": "allow-event",
-          "markdownDescription": "Enables the event command without any pre-configured scope."
+          "const": "allow-envelope",
+          "markdownDescription": "Enables the envelope command without any pre-configured scope."
         },
         {
-          "description": "Denies the event command without any pre-configured scope.",
+          "description": "Denies the envelope command without any pre-configured scope.",
           "type": "string",
-          "const": "deny-event",
-          "markdownDescription": "Denies the event command without any pre-configured scope."
+          "const": "deny-envelope",
+          "markdownDescription": "Denies the envelope command without any pre-configured scope."
         },
         {
           "description": "Enables the breadcrumb command.",
