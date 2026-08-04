@@ -17,9 +17,24 @@ pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
         Buffer::Raw(vec) => vec,
     };
 
-    let envelope = Envelope::from_slice(&buffer);
+    let parsed = Envelope::from_slice(&buffer);
 
-    if let Ok(envelope) = envelope {
+    // sentry-rust's typed envelope parser can't yet deserialize the `debug_meta`
+    // source-map images that @sentry/vite-plugin's debug-ID injection adds to
+    // every event (sentry's `DebugImage` enum has no `sourcemap` variant and no
+    // catch-all), so `from_slice` fails and the event would be silently dropped.
+    // Forward the raw envelope bytes instead — they reach Sentry with
+    // `debug_meta` intact, so server-side source-map symbolication still works.
+    //
+    // https://github.com/getsentry/sentry-rust/issues/1267
+    if parsed.is_err() {
+        if let Ok(raw) = Envelope::from_bytes_raw(buffer) {
+            sentry_client.send_envelope(raw);
+        }
+        return;
+    }
+
+    if let Ok(envelope) = parsed {
         if let Some(mut event) = envelope.event().cloned() {
             event.platform = "javascript".into();
 
