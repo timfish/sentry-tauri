@@ -1,6 +1,12 @@
-## Unreleased
+## v0.7.0
 
-- feat: Replace `sentry-rust-minidump` with `sentry-minidump`. The `minidump` feature now enables the `minidump` feature of `sentry`. Add `sentry::integrations::minidump::MinidumpIntegration` to your `sentry::ClientOptions` instead of calling `tauri_plugin_sentry::minidump::init`. The `tauri_plugin_sentry::minidump` re-export is removed. Minidumps are only available on Linux, macOS and Windows.
+- feat: Replace `sentry-rust-minidump` with `sentry-minidump`. The `minidump` feature now enables the `minidump` feature of `sentry`. Add `sentry::integrations::minidump::MinidumpIntegration` to your `sentry::ClientOptions` instead of calling `tauri_plugin_sentry::minidump::init`. The `tauri_plugin_sentry::minidump` re-export is removed (#40)
+
+## v0.6.0
+
+- Disable tauri's default features (#34)
+- Generate the envelope permission (#37)
+- Update dependencies and work around (#38)
 
 ## v0.5.0
 

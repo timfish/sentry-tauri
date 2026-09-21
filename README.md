@@ -23,7 +23,7 @@ Add `sentry` and `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 ```toml
 [dependencies]
 sentry = "0.49"
-tauri-plugin-sentry = "0.6"
+tauri-plugin-sentry = "0.7"
 ```
 
 Run one of these commands to add the capabilities:
@@ -35,16 +35,14 @@ Run one of these commands to add the capabilities:
 
 however, make sure that you have `sentry:default` in your capabilities:
 
-###### src-tauri/capabilities/*.json
+###### src-tauri/capabilities/\*.json
 
 ```json
 {
   "$schema": "./../gen/schemas/windows-schema.json",
   "identifier": "main",
   "local": true,
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "sentry:default" // <- important
   ]
