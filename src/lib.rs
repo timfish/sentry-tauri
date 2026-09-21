@@ -4,9 +4,6 @@ use tauri::{
     Manager, Runtime,
 };
 
-#[cfg(all(not(target_os = "ios"), feature = "minidump"))]
-pub use sentry_rust_minidump as minidump;
-
 #[derive(Debug, Clone)]
 pub struct JavaScriptOptions {
     pub inject: bool,
