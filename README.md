@@ -14,15 +14,16 @@ the Rust backend which has a number of advantages:
 
 ## Installation
 
-`sentry-rust-minidump` is re-exported by `sentry-tauri` so you don't need to add
-it as dependencies.
+The `minidump` feature of `tauri-plugin-sentry` is on by default and enables
+the `minidump` feature of `sentry`, so you don't need to add `sentry-minidump`
+as a dependency.
 
 Add `sentry` and `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
 sentry = "0.49"
-tauri-plugin-sentry = "0.6"
+tauri-plugin-sentry = "0.7"
 ```
 
 Run one of these commands to add the capabilities:
@@ -34,16 +35,14 @@ Run one of these commands to add the capabilities:
 
 however, make sure that you have `sentry:default` in your capabilities:
 
-###### src-tauri/capabilities/*.json
+###### src-tauri/capabilities/\*.json
 
 ```json
 {
   "$schema": "./../gen/schemas/windows-schema.json",
   "identifier": "main",
   "local": true,
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "sentry:default" // <- important
   ]
@@ -53,27 +52,25 @@ however, make sure that you have `sentry:default` in your capabilities:
 ## Usage
 
 This example also shows usage of
-[`sentry_rust_minidump`](https://github.com/timfish/sentry-rust-minidump) which
-allows you to capture minidumps for native crashes from a separate crash
-reporting process.
+[`sentry-minidump`](https://crates.io/crates/sentry-minidump) which captures
+minidumps for native crashes from a separate crash reporter process. It is
+available on Linux, macOS and Windows.
 
 ```rust
 use sentry;
 use tauri_plugin_sentry;
 
 pub fn run() {
-    let client = sentry::init((
-        "__YOUR_DSN__",
-        sentry::ClientOptions {
-            release: sentry::release_name!(),
-            auto_session_tracking: true,
-            ..Default::default()
-        },
-    ));
+    let options = sentry::ClientOptions::new()
+        .dsn("__YOUR_DSN__")
+        .maybe_release(sentry::release_name!())
+        .auto_session_tracking(true);
+
+    #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
+    let options = options.add_integration(sentry::integrations::minidump::MinidumpIntegration::new());
 
     // Caution! Everything before here runs in both app and crash reporter processes
-    #[cfg(not(target_os = "ios"))]
-    let _guard = tauri_plugin_sentry::minidump::init(&client);
+    let client = sentry::init(options);
     // Everything after here runs in only the app process
 
     tauri::Builder::default()
