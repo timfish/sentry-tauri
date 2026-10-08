@@ -58,10 +58,10 @@ available on Linux, macOS and Windows.
 
 ```rust
 use sentry;
-use tauri_plugin_sentry;
+use tauri_plugin_sentry::Sentry;
 
 pub fn run() {
-    let sentry_plugin = tauri_plugin_sentry::Sentry::new();
+    let sentry_plugin = Sentry::new();
 
     let options = sentry::ClientOptions::new()
         .add_integration(sentry_plugin.clone())
@@ -105,8 +105,10 @@ injection and pass the default config to `Sentry.init`.
 Disable automatic injection:
 
 ```rust
-let sentry_plugin = tauri_plugin_sentry::Sentry::with_options(tauri_plugin_sentry::Options {
-    javascript: tauri_plugin_sentry::JavaScriptOptions::no_injection(),
+use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
+
+let sentry_plugin = Sentry::with_options(Options {
+    javascript: JavaScriptOptions::no_injection(),
 });
 
 // Add `sentry_plugin.clone()` to the Sentry options as above

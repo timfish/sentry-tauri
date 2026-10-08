@@ -4,7 +4,7 @@
 )]
 
 use sentry;
-use tauri_plugin_sentry;
+use tauri_plugin_sentry::Sentry;
 
 #[tauri::command]
 fn rust_breadcrumb() {
@@ -26,7 +26,7 @@ fn native_crash() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let sentry_plugin = tauri_plugin_sentry::Sentry::new();
+    let sentry_plugin = Sentry::new();
 
     let options = sentry::ClientOptions::new()
         .add_integration(sentry_plugin.clone())
