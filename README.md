@@ -58,10 +58,13 @@ available on Linux, macOS and Windows.
 
 ```rust
 use sentry;
-use tauri_plugin_sentry;
+use tauri_plugin_sentry::Sentry;
 
 pub fn run() {
+    let sentry_plugin = Sentry::new();
+
     let options = sentry::ClientOptions::new()
+        .add_integration(sentry_plugin.clone())
         .dsn("__YOUR_DSN__")
         .maybe_release(sentry::release_name!())
         .auto_session_tracking(true);
@@ -70,15 +73,20 @@ pub fn run() {
     let options = options.add_integration(sentry::integrations::minidump::MinidumpIntegration::new());
 
     // Caution! Everything before here runs in both app and crash reporter processes
-    let client = sentry::init(options);
+    let _guard = sentry::init(options);
     // Everything after here runs in only the app process
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sentry::init(&client))
+        .plugin(sentry_plugin)
         .run(tauri::generate_context!())
         .expect("error while running tauri app");
 }
 ```
+
+`Sentry` is both a Sentry integration and a Tauri plugin. Add a clone to the
+Sentry options before `sentry::init` and pass the original to Tauri. The
+integration adds `tauri` and `cargo:tauri-plugin-sentry` to the SDK metadata
+of every event, including minidumps from the crash reporter process.
 
 The Plugin:
 
@@ -97,8 +105,16 @@ injection and pass the default config to `Sentry.init`.
 Disable automatic injection:
 
 ```rust
+use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
+
+let sentry_plugin = Sentry::with_options(Options {
+    javascript: JavaScriptOptions::no_injection(),
+});
+
+// Add `sentry_plugin.clone()` to the Sentry options as above
+
 tauri::Builder::default()
-    .plugin(tauri_plugin_sentry::init_with_no_injection(&client))
+    .plugin(sentry_plugin)
     .run(tauri::generate_context!())
     .expect("error while running tauri app");
 ```

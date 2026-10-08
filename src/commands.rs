@@ -70,12 +70,67 @@ pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
                 },
             )
         } else {
-            sentry_client.send_envelope(envelope);
+            sentry_client.send_envelope(add_sdk_package(envelope));
         }
     }
+}
+
+fn add_sdk_package(envelope: Envelope) -> Envelope {
+    let mut out = Envelope::new().with_headers(envelope.headers().clone());
+    for mut item in envelope.into_items() {
+        if let EnvelopeItem::Transaction(ref mut transaction) = item {
+            if let Some(sdk) = transaction.sdk.as_mut() {
+                crate::add_sdk_package(sdk);
+            }
+        }
+        out.add_item(item);
+    }
+    out
 }
 
 #[tauri::command]
 pub fn breadcrumb(breadcrumb: Breadcrumb) {
     sentry::add_breadcrumb(breadcrumb);
+}
+
+#[cfg(test)]
+mod tests {
+    use std::borrow::Cow;
+
+    use sentry::protocol::{Attachment, ClientSdkInfo, Transaction};
+
+    use super::*;
+
+    #[test]
+    fn adds_sdk_package_to_transactions() {
+        let mut envelope = Envelope::new();
+        envelope.add_item(Transaction {
+            sdk: Some(Cow::Owned(ClientSdkInfo {
+                name: "sentry.javascript.browser".into(),
+                version: "10.0.0".into(),
+                integrations: vec![],
+                packages: vec![],
+            })),
+            ..Default::default()
+        });
+        envelope.add_item(Attachment {
+            buffer: b"data".to_vec(),
+            filename: "file.txt".into(),
+            ..Default::default()
+        });
+
+        let envelope = add_sdk_package(envelope);
+        let items = envelope.items().collect::<Vec<_>>();
+        assert_eq!(items.len(), 2);
+
+        let EnvelopeItem::Transaction(transaction) = items[0] else {
+            panic!("expected transaction");
+        };
+        let sdk = transaction.sdk.as_ref().unwrap();
+        assert_eq!(sdk.name, "sentry.javascript.browser");
+        assert!(sdk
+            .packages
+            .iter()
+            .any(|p| p.name == "cargo:tauri-plugin-sentry"));
+    }
 }

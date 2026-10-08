@@ -4,7 +4,7 @@
 )]
 
 use sentry;
-use tauri_plugin_sentry;
+use tauri_plugin_sentry::Sentry;
 
 #[tauri::command]
 fn rust_breadcrumb() {
@@ -26,7 +26,10 @@ fn native_crash() {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let sentry_plugin = Sentry::new();
+
     let options = sentry::ClientOptions::new()
+        .add_integration(sentry_plugin.clone())
         .dsn("https://233a45e5efe34c47a3536797ce15dafa@o447951.ingest.sentry.io/5650507")
         .maybe_release(sentry::release_name!())
         .debug(true);
@@ -34,10 +37,10 @@ pub fn run() {
     #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
     let options = options.add_integration(sentry::integrations::minidump::MinidumpIntegration::new());
 
-    let client = sentry::init(options);
+    let _guard = sentry::init(options);
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_sentry::init(&client))
+        .plugin(sentry_plugin)
         .invoke_handler(tauri::generate_handler![
             rust_breadcrumb,
             rust_panic,
