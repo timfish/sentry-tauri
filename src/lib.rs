@@ -1,7 +1,7 @@
 use std::{borrow::Cow, sync::Arc};
 
 use sentry::{
-    protocol::{ClientSdkPackage, Event},
+    protocol::{ClientSdkInfo, ClientSdkPackage, Event},
     ClientOptions, Hub,
 };
 use tauri::{
@@ -49,6 +49,13 @@ fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
 }
 
+pub(crate) fn add_sdk_package(sdk: &mut Cow<'_, ClientSdkInfo>) {
+    sdk.to_mut().packages.push(ClientSdkPackage {
+        name: "cargo:tauri-plugin-sentry".into(),
+        version: env!("CARGO_PKG_VERSION").into(),
+    });
+}
+
 /// A Tauri plugin that is also a Sentry integration.
 ///
 /// Add a clone to the Sentry `ClientOptions` before `sentry::init` and
@@ -80,11 +87,8 @@ impl sentry::Integration for Sentry {
         mut event: Event<'static>,
         _options: &ClientOptions,
     ) -> Option<Event<'static>> {
-        if let Some(sdk) = event.sdk.as_mut().map(Cow::to_mut) {
-            sdk.packages.push(ClientSdkPackage {
-                name: "cargo:tauri-plugin-sentry".into(),
-                version: env!("CARGO_PKG_VERSION").into(),
-            });
+        if let Some(sdk) = event.sdk.as_mut() {
+            add_sdk_package(sdk);
         }
         Some(event)
     }
