@@ -101,7 +101,8 @@ The Plugin:
 Webviews run in separate processes, so the minidump integration does not
 capture their crashes. The `webview-crashes` feature is on by default. When a
 webview process exits, the plugin captures an event with the
-`event.process: webview` tag and the webview label, and adds a breadcrumb. For
+`event.process: webview`, `tauri.webview` and `tauri.window` tags, and adds a
+breadcrumb. For
 crashes and out-of-memory exits, it also ends the session with the `crashed`
 status.
 

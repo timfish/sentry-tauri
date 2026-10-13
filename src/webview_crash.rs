@@ -11,7 +11,21 @@ use tauri::{Runtime, Webview};
 /// That hook replaces the Tauri default, which reloads the webview, so
 /// reload the webview yourself after you call this function.
 pub fn web_content_process_terminated<R: Runtime>(webview: &Webview<R>) {
-    capture(webview.label(), "abnormal-exit", Map::new());
+    capture(&Labels::new(webview), "abnormal-exit", Map::new());
+}
+
+struct Labels {
+    webview: String,
+    window: String,
+}
+
+impl Labels {
+    fn new<R: Runtime>(webview: &Webview<R>) -> Self {
+        Self {
+            webview: webview.label().to_string(),
+            window: webview.window().label().to_string(),
+        }
+    }
 }
 
 /// Adds handlers that capture webview process failures. WebView2 and
@@ -26,8 +40,8 @@ pub(crate) fn install<R: Runtime>(webview: &Webview<R>) {
         target_os = "openbsd"
     ))]
     {
-        let label = webview.label().to_string();
-        let _ = webview.with_webview(move |platform| platform::install(platform, label));
+        let labels = Labels::new(webview);
+        let _ = webview.with_webview(move |platform| platform::install(platform, labels));
     }
 
     #[cfg(not(any(
@@ -50,7 +64,7 @@ fn level_for_reason(reason: &str) -> Level {
     }
 }
 
-fn capture(label: &str, reason: &str, mut data: Map<String, Value>) {
+fn capture(labels: &Labels, reason: &str, mut data: Map<String, Value>) {
     let hub = Hub::current();
     let level = level_for_reason(reason);
     let message = format!("'webview' process exited with '{reason}'");
@@ -60,7 +74,8 @@ fn capture(label: &str, reason: &str, mut data: Map<String, Value>) {
             |scope| {
                 // Scope tags replace event tags, so set them here.
                 scope.set_tag("event.process", "webview");
-                scope.set_tag("webview.label", label);
+                scope.set_tag("tauri.webview", &labels.webview);
+                scope.set_tag("tauri.window", &labels.window);
             },
             || {
                 hub.capture_event(Event {
@@ -73,7 +88,7 @@ fn capture(label: &str, reason: &str, mut data: Map<String, Value>) {
     }
 
     data.insert("reason".into(), reason.into());
-    data.insert("label".into(), label.into());
+    data.insert("label".into(), labels.webview.as_str().into());
     hub.add_breadcrumb(Breadcrumb {
         ty: "process".into(),
         category: Some("child-process".into()),
@@ -92,6 +107,8 @@ fn capture(label: &str, reason: &str, mut data: Map<String, Value>) {
 mod platform {
     use sentry::protocol::Map;
     use tauri::webview::PlatformWebview;
+
+    use super::Labels;
     use webview2_com::{
         Microsoft::Web::WebView2::Win32::{
             ICoreWebView2ProcessFailedEventArgs, ICoreWebView2ProcessFailedEventArgs2,
@@ -112,10 +129,10 @@ mod platform {
     };
     use windows_core::Interface;
 
-    pub(super) fn install(platform: PlatformWebview, label: String) {
+    pub(super) fn install(platform: PlatformWebview, labels: Labels) {
         let handler = ProcessFailedEventHandler::create(Box::new(move |_, args| {
             if let Some(args) = args {
-                on_process_failed(&label, &args);
+                on_process_failed(&labels, &args);
             }
             Ok(())
         }));
@@ -128,7 +145,7 @@ mod platform {
         }
     }
 
-    fn on_process_failed(label: &str, args: &ICoreWebView2ProcessFailedEventArgs) {
+    fn on_process_failed(labels: &Labels, args: &ICoreWebView2ProcessFailedEventArgs) {
         let mut kind = COREWEBVIEW2_PROCESS_FAILED_KIND::default();
         if unsafe { args.ProcessFailedKind(&mut kind) }.is_err() {
             return;
@@ -156,7 +173,7 @@ mod platform {
             }
         }
 
-        super::capture(label, reason, data);
+        super::capture(labels, reason, data);
     }
 
     fn kind_name(kind: COREWEBVIEW2_PROCESS_FAILED_KIND) -> &'static str {
@@ -194,7 +211,9 @@ mod platform {
     use tauri::webview::PlatformWebview;
     use webkit2gtk::{WebProcessTerminationReason, WebViewExt};
 
-    pub(super) fn install(platform: PlatformWebview, label: String) {
+    use super::Labels;
+
+    pub(super) fn install(platform: PlatformWebview, labels: Labels) {
         platform
             .inner()
             .connect_web_process_terminated(move |_, reason| {
@@ -204,7 +223,7 @@ mod platform {
                     WebProcessTerminationReason::TerminatedByApi => "clean-exit",
                     _ => "abnormal-exit",
                 };
-                super::capture(&label, reason, Map::new());
+                super::capture(&labels, reason, Map::new());
             });
     }
 }
@@ -213,10 +232,17 @@ mod platform {
 mod tests {
     use super::*;
 
+    fn labels() -> Labels {
+        Labels {
+            webview: "main".into(),
+            window: "main-window".into(),
+        }
+    }
+
     #[test]
     fn captures_event_and_breadcrumb() {
         let events = sentry::test::with_captured_events(|| {
-            capture("main", "crashed", Map::new());
+            capture(&labels(), "crashed", Map::new());
             sentry::capture_message("next", Level::Info);
         });
 
@@ -228,17 +254,19 @@ mod tests {
         );
         assert_eq!(crash.level, Level::Fatal);
         assert_eq!(crash.tags["event.process"], "webview");
-        assert_eq!(crash.tags["webview.label"], "main");
+        assert_eq!(crash.tags["tauri.webview"], "main");
+        assert_eq!(crash.tags["tauri.window"], "main-window");
 
         let breadcrumb = &events[1].breadcrumbs.values[0];
         assert_eq!(breadcrumb.category.as_deref(), Some("child-process"));
         assert_eq!(breadcrumb.data["reason"], "crashed");
+        assert_eq!(breadcrumb.data["label"], "main");
     }
 
     #[test]
     fn clean_exit_adds_only_breadcrumb() {
         let events = sentry::test::with_captured_events(|| {
-            capture("main", "clean-exit", Map::new());
+            capture(&labels(), "clean-exit", Map::new());
             sentry::capture_message("next", Level::Info);
         });
 
