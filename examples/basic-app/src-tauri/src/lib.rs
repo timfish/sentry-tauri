@@ -39,7 +39,15 @@ pub fn run() {
 
     let _guard = sentry::init(options);
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    let builder = builder.on_web_content_process_terminate(|webview| {
+        tauri_plugin_sentry::web_content_process_terminated(webview);
+        let _ = webview.reload();
+    });
+
+    builder
         .plugin(sentry_plugin)
         .invoke_handler(tauri::generate_handler![
             rust_breadcrumb,

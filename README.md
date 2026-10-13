@@ -96,6 +96,39 @@ The Plugin:
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
   Works™️
 
+## Webview Process Crashes
+
+Webviews run in separate processes, so the minidump integration does not
+capture their crashes. The `webview-crashes` feature is on by default. When a
+webview process exits, the plugin captures an event with the
+`event.process: webview`, `tauri.webview` and `tauri.window` tags, and adds a
+breadcrumb. For
+crashes and out-of-memory exits, it also ends the session with the `crashed`
+status.
+
+- **Windows**: Uses the WebView2 `ProcessFailed` event, which gives the
+  reason.
+- **Linux**: Uses the WebKitGTK `web-process-terminated` signal, which gives
+  the reason.
+- **macOS and iOS**: WebKit gives no reason and Tauri only exposes this hook
+  on the app builder. Call `web_content_process_terminated` from the hook.
+  The hook replaces the Tauri default, so reload the webview yourself:
+
+```rust
+let builder = tauri::Builder::default();
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+let builder = builder.on_web_content_process_terminate(|webview| {
+    tauri_plugin_sentry::web_content_process_terminated(webview);
+    let _ = webview.reload();
+});
+```
+
+- **Android**: Not supported.
+
+This feature enables the `wry` feature of `tauri` and the `release-health`
+feature of `sentry`.
+
 ## Custom Sentry Browser Configuration
 
 By default the plugin injects a pre-minified version of `@sentry/browser`. If

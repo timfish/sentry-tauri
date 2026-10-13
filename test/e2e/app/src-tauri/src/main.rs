@@ -3,6 +3,8 @@ use std::time::Duration;
 use tauri::{webview::PageLoadEvent, AppHandle, RunEvent, State, WebviewWindowBuilder};
 use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
 
+mod webview_crash;
+
 struct Scenario(String);
 
 #[tauri::command]
@@ -63,7 +65,15 @@ fn main() {
 
     let _guard = sentry::init(options);
 
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+
+    #[cfg(target_os = "macos")]
+    let builder = builder.on_web_content_process_terminate(|webview| {
+        tauri_plugin_sentry::web_content_process_terminated(webview);
+        let _ = webview.reload();
+    });
+
+    builder
         .plugin(sentry_plugin)
         .manage(Scenario(name))
         .on_page_load(|_, payload| {
@@ -78,6 +88,7 @@ fn main() {
             rust_breadcrumb,
             rust_panic,
             native_crash,
+            webview_crash::crash_webview,
             exit
         ])
         .setup(|app| {
