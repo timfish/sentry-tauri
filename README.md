@@ -88,6 +88,19 @@ Sentry options before `sentry::init` and pass the original to Tauri. The
 integration adds `tauri` and `cargo:tauri-plugin-sentry` to the SDK metadata
 of every event, including minidumps from the crash reporter process.
 
+The integration also adds this context to events from Rust and the browser:
+
+- `app`: name, version, identifier, start time, architecture, whether a
+  window has focus (`in_foreground`) and the build type (`app-store` for Mac
+  App Store builds, `windows-store` for packaged Windows apps)
+- `runtime`: Tauri and its version
+- `browser`: the webview (WebView2, WKWebView, WebKitGTK or Android System
+  WebView) and its version
+- `device`: the resolution and scale factor of the primary monitor
+
+The webview version needs the `wry` feature, which is on by default and
+enables the `wry` feature of `tauri`.
+
 The Plugin:
 
 - By default injects and initialises `@sentry/browser` in every web-view
