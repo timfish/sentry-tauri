@@ -8,6 +8,7 @@ export declare function makeRendererTransport(options: BaseTransportOptions): Tr
  * A `beforeBreadcrumb` hook that sends the breadcrumb to the Rust process via Tauri invoke.
  */
 export declare function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null;
+export { scopeToRustIntegration } from './scope.js';
 /**
  * Default options for the Sentry browser SDK to pass events and breadcrumbs to
  * the Rust SDK.

@@ -48,6 +48,7 @@ pub struct Options {
 mod breadcrumbs;
 mod commands;
 mod process;
+mod scope;
 
 pub use breadcrumbs::{BreadcrumbOptions, EventFilter};
 
@@ -127,7 +128,7 @@ impl<R: Runtime> Plugin<R> for Sentry {
 
     fn extend_api(&mut self, invoke: Invoke<R>) -> bool {
         let handler: fn(Invoke<R>) -> bool =
-            generate_handler![commands::breadcrumb, commands::envelope];
+            generate_handler![commands::breadcrumb, commands::envelope, scope::scope];
         handler(invoke)
     }
 
@@ -160,7 +161,11 @@ pub fn init_with_options<R: Runtime>(
     let sentry_client = sentry_client.clone();
 
     let mut plugin_builder = Builder::<R>::new("sentry")
-        .invoke_handler(generate_handler![commands::breadcrumb, commands::envelope])
+        .invoke_handler(generate_handler![
+            commands::breadcrumb,
+            commands::envelope,
+            scope::scope
+        ])
         .setup(move |app, _| {
             app.manage(sentry_client);
             Ok(())
