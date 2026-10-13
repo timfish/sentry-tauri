@@ -47,6 +47,7 @@ pub struct Options {
 
 mod breadcrumbs;
 mod commands;
+mod context;
 mod process;
 
 pub use breadcrumbs::{BreadcrumbOptions, EventFilter};
@@ -69,6 +70,7 @@ pub(crate) fn add_sdk_package(sdk: &mut Cow<'_, ClientSdkInfo>) {
 #[derive(Debug, Clone, Default)]
 pub struct Sentry {
     options: Arc<Options>,
+    context: Arc<context::TauriContext>,
 }
 
 impl Sentry {
@@ -79,6 +81,7 @@ impl Sentry {
     pub fn with_options(options: Options) -> Self {
         Self {
             options: Arc::new(options),
+            ..Default::default()
         }
     }
 }
@@ -97,6 +100,7 @@ impl sentry::Integration for Sentry {
             add_sdk_package(sdk);
         }
         process::tag_rust_event(&mut event.tags);
+        self.context.apply(&mut event);
         Some(event)
     }
 }
@@ -115,6 +119,7 @@ impl<R: Runtime> Plugin<R> for Sentry {
             .client()
             .ok_or("sentry::init must be called before the Sentry plugin is initialized")?;
         app.manage((*client).clone());
+        self.context.initialize(app);
         Ok(())
     }
 
@@ -150,6 +155,7 @@ impl<R: Runtime> Plugin<R> for Sentry {
 
     fn on_event(&mut self, app: &AppHandle<R>, event: &RunEvent) {
         breadcrumbs::on_event(&self.options.breadcrumbs, app, event);
+        self.context.on_event(app, event);
     }
 }
 
