@@ -1,11 +1,12 @@
 ## Default Permission
 
-Allows all required permissions (envelope, breadcrumb)
+Allows all required permissions (envelope, breadcrumb, scope)
 
 #### This default permission set includes the following:
 
 - `allow-envelope`
 - `allow-breadcrumb`
+- `allow-scope`
 
 ## Permission Table
 
@@ -71,6 +72,32 @@ Denies the envelope command without any pre-configured scope.
 <tr>
 <td>
 
+`sentry:allow-scope`
+
+</td>
+<td>
+
+Enables the scope command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`sentry:deny-scope`
+
+</td>
+<td>
+
+Denies the scope command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
 `sentry:allow-breadcrumb`
 
 </td>
@@ -116,6 +143,32 @@ Enables the envelope command.
 <td>
 
 Denies the envelope command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`sentry:allow-scope`
+
+</td>
+<td>
+
+Enables the scope command.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`sentry:deny-scope`
+
+</td>
+<td>
+
+Denies the scope command.
 
 </td>
 </tr>

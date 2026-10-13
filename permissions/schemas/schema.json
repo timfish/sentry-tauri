@@ -319,6 +319,18 @@
           "markdownDescription": "Denies the envelope command without any pre-configured scope."
         },
         {
+          "description": "Enables the scope command without any pre-configured scope.",
+          "type": "string",
+          "const": "allow-scope",
+          "markdownDescription": "Enables the scope command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the scope command without any pre-configured scope.",
+          "type": "string",
+          "const": "deny-scope",
+          "markdownDescription": "Denies the scope command without any pre-configured scope."
+        },
+        {
           "description": "Enables the breadcrumb command.",
           "type": "string",
           "const": "allow-breadcrumb",
@@ -331,10 +343,10 @@
           "markdownDescription": "Denies the breadcrumb command."
         },
         {
-          "description": "Allows all required permissions (envelope, breadcrumb)\n#### This default permission set includes:\n\n- `allow-envelope`\n- `allow-breadcrumb`",
+          "description": "Allows all required permissions (envelope, breadcrumb, scope)\n#### This default permission set includes:\n\n- `allow-envelope`\n- `allow-breadcrumb`\n- `allow-scope`",
           "type": "string",
           "const": "default",
-          "markdownDescription": "Allows all required permissions (envelope, breadcrumb)\n#### This default permission set includes:\n\n- `allow-envelope`\n- `allow-breadcrumb`"
+          "markdownDescription": "Allows all required permissions (envelope, breadcrumb, scope)\n#### This default permission set includes:\n\n- `allow-envelope`\n- `allow-breadcrumb`\n- `allow-scope`"
         },
         {
           "description": "Enables the envelope command.",
@@ -347,6 +359,18 @@
           "type": "string",
           "const": "deny-envelope",
           "markdownDescription": "Denies the envelope command."
+        },
+        {
+          "description": "Enables the scope command.",
+          "type": "string",
+          "const": "allow-scope",
+          "markdownDescription": "Enables the scope command."
+        },
+        {
+          "description": "Denies the scope command.",
+          "type": "string",
+          "const": "deny-scope",
+          "markdownDescription": "Denies the scope command."
         }
       ]
     }

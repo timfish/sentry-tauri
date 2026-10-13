@@ -7,6 +7,7 @@ import type {
   TransportMakeRequestResponse,
   TransportRequest,
 } from '@sentry/core';
+import { scopeToRustIntegration } from './scope.js';
 
 // If IPC fails this is usually due to permissions. We quit sending because we
 // can't recover from this and we don't want to spam the console with errors.
@@ -58,6 +59,8 @@ export function sendBreadcrumbToRust(breadcrumb: Breadcrumb): Breadcrumb | null 
   return null;
 }
 
+export { scopeToRustIntegration } from './scope.js';
+
 /**
  * Default options for the Sentry browser SDK to pass events and breadcrumbs to
  * the Rust SDK.
@@ -66,7 +69,10 @@ export const defaultOptions: BrowserOptions = {
   // We don't send from the browser but a DSN is required for the SDK to start
   dsn: 'https://123456@dummy.dsn/0',
   // We want to track app sessions rather than browser sessions
-  integrations: (integrations) => integrations.filter((i) => i.name !== 'BrowserSession'),
+  integrations: (integrations) => [
+    ...integrations.filter((i) => i.name !== 'BrowserSession'),
+    scopeToRustIntegration(),
+  ],
   transport: makeRendererTransport,
   beforeBreadcrumb: sendBreadcrumbToRust,
 };
