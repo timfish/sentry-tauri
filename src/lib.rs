@@ -8,7 +8,7 @@ use tauri::{
     generate_handler,
     ipc::Invoke,
     plugin::{Builder, Plugin, TauriPlugin},
-    AppHandle, Manager, Runtime,
+    AppHandle, Manager, Runtime, Webview,
 };
 
 #[derive(Debug, Clone)]
@@ -44,6 +44,11 @@ pub struct Options {
 }
 
 mod commands;
+#[cfg(feature = "webview-crashes")]
+mod webview_crash;
+
+#[cfg(feature = "webview-crashes")]
+pub use webview_crash::web_content_process_terminated;
 
 fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
@@ -118,6 +123,11 @@ impl<R: Runtime> Plugin<R> for Sentry {
             .then(|| js_init_script(&self.options.javascript))
     }
 
+    fn webview_created(&mut self, _webview: Webview<R>) {
+        #[cfg(feature = "webview-crashes")]
+        webview_crash::install(&_webview);
+    }
+
     fn extend_api(&mut self, invoke: Invoke<R>) -> bool {
         let handler: fn(Invoke<R>) -> bool =
             generate_handler![commands::breadcrumb, commands::envelope];
@@ -136,6 +146,10 @@ pub fn init_with_options<R: Runtime>(
         .setup(move |app, _| {
             app.manage(sentry_client);
             Ok(())
+        })
+        .on_webview_ready(|_webview| {
+            #[cfg(feature = "webview-crashes")]
+            webview_crash::install(&_webview);
         });
 
     if options.javascript.inject {
