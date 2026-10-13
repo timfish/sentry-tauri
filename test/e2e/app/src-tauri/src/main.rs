@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use tauri::{webview::PageLoadEvent, AppHandle, State};
+use tauri::{webview::PageLoadEvent, AppHandle, RunEvent, State, WebviewWindowBuilder};
 use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
 
 struct Scenario(String);
@@ -80,6 +80,18 @@ fn main() {
             native_crash,
             exit
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri app");
+        .setup(|app| {
+            println!("[e2e] setup");
+            let config = app.config().app.windows[0].clone();
+            WebviewWindowBuilder::from_config(app.handle(), &config)?.build()?;
+            println!("[e2e] main window created");
+            Ok(())
+        })
+        .build(tauri::generate_context!())
+        .expect("error while building tauri app")
+        .run(|_, event| {
+            if let RunEvent::Ready = event {
+                println!("[e2e] event loop ready");
+            }
+        });
 }

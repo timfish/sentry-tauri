@@ -8,6 +8,8 @@
   "app": {
     "windows": [
       {
+        "label": "main",
+        "create": false,
         "title": "sentry-tauri-e2e",
         "width": 400,
         "height": 300
