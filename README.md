@@ -11,6 +11,11 @@ the Rust backend which has a number of advantages:
 - Breadcrumbs are merged from both the Rust and browser SDKs
   - See what was happening in the Rust backend and the browser frontend at the
     time of the event
+- Events show where they came from with the `event.process` tag
+  - `rust` for Rust events, panics and minidumps, `webview` for browser events
+    and transactions
+  - Browser events and transactions also get the `tauri.webview` and
+    `tauri.window` tags with the labels of the webview and window
 
 ## Installation
 
