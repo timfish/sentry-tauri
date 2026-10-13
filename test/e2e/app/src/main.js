@@ -18,6 +18,13 @@ function loadScript(src) {
   });
 }
 
+function setScope() {
+  window.Sentry.setUser({ id: 'e2e-user', email: 'e2e@example.com' });
+  window.Sentry.setTag('e2e-tag', 'tag value');
+  window.Sentry.setExtra('e2e-extra', { nested: true });
+  window.Sentry.setContext('e2e-context', { key: 'value' });
+}
+
 const scenarios = {
   async 'js-error'() {
     await invoke('rust_breadcrumb');
@@ -37,6 +44,28 @@ const scenarios = {
     Sentry.init({ ...defaultOptions, tracesSampleRate: 1 });
     window.Sentry = Sentry;
     await Sentry.startSpan({ name: 'e2e transaction', op: 'e2e' }, () => delay(50));
+  },
+  async 'scope-sync-panic'() {
+    setScope();
+    await delay(100);
+    await invoke('rust_panic');
+  },
+  async 'scope-sync-async'() {
+    setScope();
+    await delay(100);
+    await invoke('rust_async_message');
+  },
+  async 'scope-sync-crash'() {
+    setScope();
+    await delay(100);
+    await invoke('native_crash');
+  },
+  async 'scope-sync-clear-user'() {
+    setScope();
+    await delay(100);
+    window.Sentry.setUser(null);
+    await delay(100);
+    await invoke('rust_panic');
   },
   async 'debug-id'() {
     await loadScript('debug-id.js');
