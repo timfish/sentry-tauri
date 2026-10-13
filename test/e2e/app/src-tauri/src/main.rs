@@ -25,6 +25,11 @@ fn rust_panic() {
 }
 
 #[tauri::command]
+async fn rust_async_message() {
+    sentry::capture_message("rust async message", sentry::Level::Info);
+}
+
+#[tauri::command]
 fn native_crash() {
     unsafe { sadness_generator::raise_segfault() }
 }
@@ -80,6 +85,7 @@ fn main() {
             scenario,
             rust_breadcrumb,
             rust_panic,
+            rust_async_message,
             native_crash,
             exit
         ])
