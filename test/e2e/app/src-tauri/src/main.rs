@@ -48,7 +48,10 @@ fn main() {
     } else {
         JavaScriptOptions::default()
     };
-    let sentry_plugin = Sentry::with_options(Options { javascript });
+    let sentry_plugin = Sentry::with_options(Options {
+        javascript,
+        ..Default::default()
+    });
 
     let options = sentry::ClientOptions::new()
         .add_integration(sentry_plugin.clone())
