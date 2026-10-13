@@ -7,6 +7,9 @@ import type {
   TransportMakeRequestResponse,
   TransportRequest,
 } from '@sentry/core';
+import { normalizeUrlsIntegration } from './normalize';
+
+export { normalizeUrls, normalizeUrlsIntegration } from './normalize';
 
 // If IPC fails this is usually due to permissions. We quit sending because we
 // can't recover from this and we don't want to spam the console with errors.
@@ -66,7 +69,10 @@ export const defaultOptions: BrowserOptions = {
   // We don't send from the browser but a DSN is required for the SDK to start
   dsn: 'https://123456@dummy.dsn/0',
   // We want to track app sessions rather than browser sessions
-  integrations: (integrations) => integrations.filter((i) => i.name !== 'BrowserSession'),
+  integrations: (integrations) => [
+    ...integrations.filter((i) => i.name !== 'BrowserSession'),
+    normalizeUrlsIntegration(),
+  ],
   transport: makeRendererTransport,
   beforeBreadcrumb: sendBreadcrumbToRust,
 };

@@ -131,6 +131,44 @@ Sentry.init({
 });
 ```
 
+If you pass your own `integrations`, add `normalizeUrlsIntegration()` from
+`tauri-plugin-sentry-api` to keep the URL normalisation described below.
+
+## Source Maps
+
+Tauri serves the web-view from a different URL on each platform:
+`tauri://localhost` on macOS, iOS and Linux, `http://tauri.localhost` on
+Windows and Android, and the dev server URL in development. The browser SDK
+replaces this origin with `app:///` in stack frames, debug images, request
+URLs, transaction names and spans. This means that the same error groups into
+one issue on every platform.
+
+If you use [debug IDs](https://docs.sentry.io/platforms/javascript/sourcemaps/troubleshooting_js/debug-ids/),
+Sentry matches source maps by debug ID and the URL prefix does not matter.
+`@sentry/vite-plugin` injects debug IDs by default:
+
+```ts
+import { sentryVitePlugin } from "@sentry/vite-plugin";
+
+export default defineConfig({
+  build: { sourcemap: true },
+  plugins: [sentryVitePlugin({ org: "__ORG__", project: "__PROJECT__" })],
+});
+```
+
+`sentry-cli` can also inject debug IDs:
+
+```shell
+> sentry-cli sourcemaps inject ./dist
+> sentry-cli sourcemaps upload ./dist
+```
+
+Without debug IDs, upload the source maps with the `app:///` URL prefix:
+
+```shell
+> sentry-cli sourcemaps upload --release <release> --url-prefix 'app:///' ./dist
+```
+
 ## Example App
 
 Clone this repository and install dependencies:
