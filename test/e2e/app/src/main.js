@@ -67,6 +67,13 @@ const scenarios = {
     await delay(100);
     await invoke('rust_panic');
   },
+  async 'webview-crash'() {
+    // The page loads again after the crash on macOS. Then the command
+    // returns false and the scenario ends.
+    if (await invoke('crash_webview')) {
+      await new Promise(() => {});
+    }
+  },
   async 'debug-id'() {
     await loadScript('debug-id.js');
     throwUncaught(window.throwWithDebugId);
