@@ -50,8 +50,12 @@ mod commands;
 mod context;
 mod process;
 mod scope;
+#[cfg(feature = "webview-crashes")]
+mod webview_crash;
 
 pub use breadcrumbs::{BreadcrumbOptions, EventFilter};
+#[cfg(feature = "webview-crashes")]
+pub use webview_crash::web_content_process_terminated;
 
 fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
@@ -143,6 +147,8 @@ impl<R: Runtime> Plugin<R> for Sentry {
 
     fn webview_created(&mut self, webview: Webview<R>) {
         breadcrumbs::on_webview_created(&self.options.breadcrumbs, &webview);
+        #[cfg(feature = "webview-crashes")]
+        webview_crash::install(&webview);
     }
 
     fn on_navigation(&mut self, webview: &Webview<R>, url: &Url) -> bool {
