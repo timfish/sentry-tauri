@@ -1,0 +1,6 @@
+{
+  "identifier": "main",
+  "local": true,
+  "windows": ["main"],
+  "permissions": ["sentry:default"]
+}

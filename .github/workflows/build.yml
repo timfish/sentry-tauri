@@ -1,0 +1,130 @@
+name: 'Build & Test'
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  LINUX_DEPS: libwebkit2gtk-4.1-dev libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+
+jobs:
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: cargo fmt --check
+      - run: cargo fmt --check --manifest-path test/e2e/app/src-tauri/Cargo.toml
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Install Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y $LINUX_DEPS
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: cargo clippy --all-targets -- -D warnings
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Install Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y $LINUX_DEPS
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - run: cargo test
+
+  dist:
+    name: Check dist is up to date
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - run: yarn install --frozen-lockfile
+      - run: yarn build:ts
+      - name: Check for changes
+        run: git diff --exit-code -- dist || (echo "dist/ is out of date. Run 'yarn build:ts' and commit the result." && exit 1)
+
+  example:
+    name: Check example app
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Install Linux dependencies
+        run: sudo apt-get update && sudo apt-get install -y $LINUX_DEPS
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: examples/basic-app/src-tauri -> target
+      - run: cargo check --manifest-path examples/basic-app/src-tauri/Cargo.toml
+
+  e2e:
+    name: E2E Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    env:
+      # Only WebKitGTK reads this. There is no GPU under xvfb.
+      WEBKIT_DISABLE_DMABUF_RENDERER: 1
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y $LINUX_DEPS xvfb dbus-daemon dbus-x11
+      # systemd-coredump keeps a crashed process alive until it has the
+      # whole core. This makes the native crash test time out.
+      - name: Disable core dumps
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.core_pattern=core
+      # Ubuntu 24.04 blocks unprivileged user namespaces with AppArmor.
+      # The WebKitGTK sandbox needs them to start the web process.
+      - name: Allow unprivileged user namespaces
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: test/e2e/app/src-tauri -> target
+      - run: yarn install --frozen-lockfile
+      - name: Build test app
+        run: yarn e2e:build
+      - name: Run E2E Tests
+        if: runner.os != 'Linux'
+        timeout-minutes: 10
+        run: yarn e2e:test
+      - name: Diagnose test app startup
+        if: runner.os == 'Linux'
+        continue-on-error: true
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          dbus-run-session -- xvfb-run -a -s "-screen 0 1280x1024x24" bash -c '
+            SENTRY_E2E_SCENARIO=js-error \
+            SENTRY_E2E_DSN=http://public@127.0.0.1:9/1 \
+            G_MESSAGES_DEBUG=all \
+            RUST_LOG=trace \
+              ./test/e2e/app/src-tauri/target/debug/sentry-tauri-e2e > "$RUNNER_TEMP/app.log" 2>&1 &
+            pid=$!
+            sleep 20
+            ps -ef --forest
+            kill $pid 2>/dev/null
+            sleep 1
+            kill -9 $pid 2>/dev/null
+            cat "$RUNNER_TEMP/app.log"
+          '
+      - name: Run E2E Tests
+        if: runner.os == 'Linux'
+        timeout-minutes: 10
+        run: dbus-run-session -- xvfb-run -a -s "-screen 0 1280x1024x24" yarn e2e:test

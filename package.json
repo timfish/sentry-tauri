@@ -14,6 +14,9 @@
     "build:ts": "tsc --project ./js/tsconfig.json && rollup -c ./js/rollup.config.mjs",
     "build:rust": "cargo build",
     "example": "cd examples/basic-app && yarn && yarn tauri dev",
+    "e2e": "yarn e2e:build && yarn e2e:test",
+    "e2e:build": "rollup -c ./test/e2e/app/rollup.config.mjs && cargo build --manifest-path ./test/e2e/app/src-tauri/Cargo.toml",
+    "e2e:test": "vitest run --config ./test/e2e/vitest.config.mts",
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
@@ -22,7 +25,8 @@
     "@sentry/core": "^10.8.0",
     "rollup": "^4.50.0",
     "@rollup/plugin-terser": "^0.4.4",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@tauri-apps/api": "2.0.0-beta.8",
