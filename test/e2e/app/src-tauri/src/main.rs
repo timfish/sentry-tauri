@@ -1,12 +1,13 @@
 use std::time::Duration;
 
-use tauri::{AppHandle, State};
+use tauri::{webview::PageLoadEvent, AppHandle, State};
 use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
 
 struct Scenario(String);
 
 #[tauri::command]
 fn scenario(scenario: State<'_, Scenario>) -> String {
+    println!("[e2e] frontend asked for scenario '{}'", scenario.0);
     scenario.0.clone()
 }
 
@@ -65,6 +66,13 @@ fn main() {
     tauri::Builder::default()
         .plugin(sentry_plugin)
         .manage(Scenario(name))
+        .on_page_load(|_, payload| {
+            let event = match payload.event() {
+                PageLoadEvent::Started => "started",
+                PageLoadEvent::Finished => "finished",
+            };
+            println!("[e2e] page load {event}: {}", payload.url());
+        })
         .invoke_handler(tauri::generate_handler![
             scenario,
             rust_breadcrumb,
