@@ -8,7 +8,7 @@ use tauri::{
     generate_handler,
     ipc::Invoke,
     plugin::{Builder, Plugin, TauriPlugin},
-    AppHandle, Manager, Runtime,
+    AppHandle, Manager, RunEvent, Runtime,
 };
 
 #[derive(Debug, Clone)]
@@ -44,6 +44,7 @@ pub struct Options {
 }
 
 mod commands;
+mod context;
 
 fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
@@ -63,6 +64,7 @@ pub(crate) fn add_sdk_package(sdk: &mut Cow<'_, ClientSdkInfo>) {
 #[derive(Debug, Clone, Default)]
 pub struct Sentry {
     options: Arc<Options>,
+    context: Arc<context::TauriContext>,
 }
 
 impl Sentry {
@@ -73,6 +75,7 @@ impl Sentry {
     pub fn with_options(options: Options) -> Self {
         Self {
             options: Arc::new(options),
+            ..Default::default()
         }
     }
 }
@@ -90,6 +93,7 @@ impl sentry::Integration for Sentry {
         if let Some(sdk) = event.sdk.as_mut() {
             add_sdk_package(sdk);
         }
+        self.context.apply(&mut event);
         Some(event)
     }
 }
@@ -108,7 +112,12 @@ impl<R: Runtime> Plugin<R> for Sentry {
             .client()
             .ok_or("sentry::init must be called before the Sentry plugin is initialized")?;
         app.manage((*client).clone());
+        self.context.initialize(app);
         Ok(())
+    }
+
+    fn on_event(&mut self, app: &AppHandle<R>, event: &RunEvent) {
+        self.context.on_event(app, event);
     }
 
     fn initialization_script(&self) -> Option<String> {
