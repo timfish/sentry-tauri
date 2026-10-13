@@ -54,6 +54,24 @@ however, make sure that you have `sentry:default` in your capabilities:
 }
 ```
 
+## Cargo features
+
+Both features are on by default:
+
+- `minidump`: enables the `minidump` feature of `sentry` to capture native
+  crashes
+- `wry`: enables the `wry` feature of `tauri` to add the webview version to
+  the `browser` context
+
+If your app does not use the wry runtime, turn off the default features and
+enable only `minidump`:
+
+```toml
+tauri-plugin-sentry = { version = "0.8", default-features = false, features = ["minidump"] }
+```
+
+Without `wry`, events have no `browser` context with the webview version.
+
 ## Usage
 
 This example also shows usage of
@@ -103,8 +121,8 @@ The integration also adds this context to events from Rust and the browser:
   WebView) and its version
 - `device`: the resolution and scale factor of the primary monitor
 
-The webview version needs the `wry` feature, which is on by default and
-enables the `wry` feature of `tauri`.
+The webview version needs the `wry` feature. See
+[Cargo features](#cargo-features).
 
 The Plugin:
 
