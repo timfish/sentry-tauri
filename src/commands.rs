@@ -1,6 +1,8 @@
 use sentry::{protocol::EnvelopeItem, Breadcrumb, Client, Envelope};
 use serde::Deserialize;
-use tauri::State;
+use tauri::{Runtime, State, Webview};
+
+use crate::process::WebviewTags;
 
 #[derive(Debug, Clone, Deserialize)]
 #[serde(untagged)]
@@ -11,7 +13,12 @@ pub enum Buffer {
 }
 
 #[tauri::command]
-pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
+pub fn envelope<R: Runtime>(
+    webview: Webview<R>,
+    sentry_client: State<'_, Client>,
+    envelope: Buffer,
+) {
+    let tags = WebviewTags::new(&webview);
     let buffer = match envelope {
         Buffer::Text(str) => str.into_bytes(),
         Buffer::Raw(vec) => vec,
@@ -61,6 +68,7 @@ pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
 
             sentry::with_scope(
                 |scope| {
+                    tags.apply_to_scope(scope);
                     for attachment in attachments {
                         scope.add_attachment(attachment);
                     }
@@ -70,18 +78,19 @@ pub fn envelope(sentry_client: State<'_, Client>, envelope: Buffer) {
                 },
             )
         } else {
-            sentry_client.send_envelope(add_sdk_package(envelope));
+            sentry_client.send_envelope(add_sdk_package(envelope, &tags));
         }
     }
 }
 
-fn add_sdk_package(envelope: Envelope) -> Envelope {
+fn add_sdk_package(envelope: Envelope, tags: &WebviewTags) -> Envelope {
     let mut out = Envelope::new().with_headers(envelope.headers().clone());
     for mut item in envelope.into_items() {
         if let EnvelopeItem::Transaction(ref mut transaction) = item {
             if let Some(sdk) = transaction.sdk.as_mut() {
                 crate::add_sdk_package(sdk);
             }
+            tags.apply(&mut transaction.tags);
         }
         out.add_item(item);
     }
@@ -119,7 +128,8 @@ mod tests {
             ..Default::default()
         });
 
-        let envelope = add_sdk_package(envelope);
+        let tags = WebviewTags::from_labels("main-view", "main");
+        let envelope = add_sdk_package(envelope, &tags);
         let items = envelope.items().collect::<Vec<_>>();
         assert_eq!(items.len(), 2);
 
@@ -132,5 +142,8 @@ mod tests {
             .packages
             .iter()
             .any(|p| p.name == "cargo:tauri-plugin-sentry"));
+        assert_eq!(transaction.tags["event.process"], "webview");
+        assert_eq!(transaction.tags["tauri.webview"], "main-view");
+        assert_eq!(transaction.tags["tauri.window"], "main");
     }
 }

@@ -44,6 +44,7 @@ pub struct Options {
 }
 
 mod commands;
+mod process;
 
 fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
@@ -90,6 +91,7 @@ impl sentry::Integration for Sentry {
         if let Some(sdk) = event.sdk.as_mut() {
             add_sdk_package(sdk);
         }
+        process::tag_rust_event(&mut event.tags);
         Some(event)
     }
 }
@@ -178,5 +180,6 @@ mod tests {
             .packages
             .iter()
             .any(|p| p.name == "cargo:tauri-plugin-sentry"));
+        assert_eq!(events[0].tags["event.process"], "rust");
     }
 }
