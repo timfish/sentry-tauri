@@ -1,0 +1,14 @@
+[package]
+name = "sentry-tauri-e2e"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+sadness-generator = "0.6"
+sentry = "0.49"
+tauri = { version = "2", features = ["custom-protocol"] }
+tauri-plugin-sentry = { path = "../../../.." }

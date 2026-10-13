@@ -1,0 +1,23 @@
+{
+  "productName": "sentry-tauri-e2e",
+  "version": "0.1.0",
+  "identifier": "io.sentry.tauri.e2e",
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "sentry-tauri-e2e",
+        "width": 400,
+        "height": 300
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "icon": ["icons/icon.png", "icons/icon.ico"]
+  }
+}
