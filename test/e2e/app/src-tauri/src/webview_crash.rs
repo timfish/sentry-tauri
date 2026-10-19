@@ -13,12 +13,28 @@ pub fn crash_webview(webview: Webview) -> bool {
     }
 
     println!("[e2e] crashing webview '{}'", webview.label());
+    watch(&webview);
     // Crash after the command returns its response.
     std::thread::spawn(move || {
         std::thread::sleep(std::time::Duration::from_millis(500));
         crash(webview);
     });
     true
+}
+
+/// Prints when the webview reports the exit, so a failed test shows
+/// whether the crash happened.
+#[cfg(target_os = "linux")]
+fn watch(webview: &Webview) {
+    use webkit2gtk::WebViewExt;
+
+    let _ = webview.with_webview(|platform| {
+        platform
+            .inner()
+            .connect_web_process_terminated(|_, reason| {
+                println!("[e2e] web-process-terminated: {reason:?}");
+            });
+    });
 }
 
 #[cfg(target_os = "linux")]
@@ -32,11 +48,19 @@ fn crash(_webview: Webview) {
         })
         .collect::<Vec<_>>();
 
-    println!("[e2e] sending SIGSEGV to WebKitWebProcess {pids:?}");
-    for pid in pids {
+    // The sandbox can run the web process as PID 1 in a new PID namespace.
+    // PID 1 ignores signals that have no handler, but not SIGKILL.
+    println!("[e2e] sending SIGKILL to WebKitWebProcess {pids:?}");
+    for pid in &pids {
         let _ = std::process::Command::new("kill")
-            .args(["-SEGV", &pid.to_string()])
+            .args(["-KILL", &pid.to_string()])
             .status();
+    }
+
+    std::thread::sleep(std::time::Duration::from_secs(1));
+    for pid in pids {
+        let gone = !std::path::Path::new(&format!("/proc/{pid}")).exists();
+        println!("[e2e] WebKitWebProcess {pid} gone: {gone}");
     }
 }
 
@@ -71,6 +95,29 @@ fn descendants(root: u32) -> Vec<u32> {
 }
 
 #[cfg(windows)]
+fn watch(webview: &Webview) {
+    use webview2_com::{
+        Microsoft::Web::WebView2::Win32::COREWEBVIEW2_PROCESS_FAILED_KIND,
+        ProcessFailedEventHandler,
+    };
+
+    let _ = webview.with_webview(|platform| unsafe {
+        let handler = ProcessFailedEventHandler::create(Box::new(|_, args| {
+            let mut kind = COREWEBVIEW2_PROCESS_FAILED_KIND::default();
+            if let Some(args) = args {
+                let _ = args.ProcessFailedKind(&mut kind);
+            }
+            println!("[e2e] ProcessFailed: {kind:?}");
+            Ok(())
+        }));
+        if let Ok(core) = platform.controller().CoreWebView2() {
+            let mut token = 0;
+            let _ = core.add_ProcessFailed(&handler, &mut token);
+        }
+    });
+}
+
+#[cfg(windows)]
 fn crash(webview: Webview) {
     use webview2_com::CallDevToolsProtocolMethodCompletedHandler;
     use windows_core::w;
@@ -99,6 +146,9 @@ fn crash(webview: Webview) {
             .status();
     });
 }
+
+#[cfg(not(any(target_os = "linux", windows)))]
+fn watch(_webview: &Webview) {}
 
 #[cfg(not(any(target_os = "linux", windows, target_os = "macos")))]
 fn crash(_webview: Webview) {}

@@ -77,6 +77,7 @@ fn main() {
 
     #[cfg(target_os = "macos")]
     let builder = builder.on_web_content_process_terminate(|webview| {
+        println!("[e2e] web content process terminated");
         tauri_plugin_sentry::web_content_process_terminated(webview);
         let _ = webview.reload();
     });
