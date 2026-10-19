@@ -1,6 +1,8 @@
 import { createTransport } from '@sentry/browser';
 import { invoke } from '@tauri-apps/api/core';
+import { normalizeUrlsIntegration } from './normalize.js';
 import { scopeToRustIntegration } from './scope.js';
+export { normalizeUrls, normalizeUrlsIntegration } from './normalize.js';
 // If IPC fails this is usually due to permissions. We quit sending because we
 // can't recover from this and we don't want to spam the console with errors.
 let ipcFailed = false;
@@ -54,6 +56,7 @@ export const defaultOptions = {
     integrations: (integrations) => [
         ...integrations.filter((i) => i.name !== 'BrowserSession'),
         scopeToRustIntegration(),
+        normalizeUrlsIntegration(),
     ],
     transport: makeRendererTransport,
     beforeBreadcrumb: sendBreadcrumbToRust,
