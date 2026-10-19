@@ -100,6 +100,37 @@ The Plugin:
   breadcrumbs to the Rust SDK via the Tauri `invoke` API
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
   Works™️
+- Adds breadcrumbs for Tauri app, window and webview events
+
+## Breadcrumbs for Tauri Events
+
+The plugin adds breadcrumbs with the category `tauri` for app, window and
+webview events. The message has the form `app.ready`, `window.focus` or
+`webview.page-load-finished`, and the data includes the window or webview
+label. Navigation and page load breadcrumbs include the URL.
+
+By default, events that fire at a high rate (`resize`, `move`, `drag-enter`,
+`drag-over` and `drag-leave`) do not create breadcrumbs. Window titles are not
+captured unless you enable `capture_window_titles`.
+
+```rust
+use tauri_plugin_sentry::{BreadcrumbOptions, EventFilter, Options, Sentry};
+
+let sentry_plugin = Sentry::with_options(Options {
+    breadcrumbs: BreadcrumbOptions {
+        // No breadcrumbs for app events
+        app: EventFilter::None,
+        // Only these window events
+        window: EventFilter::Only(vec!["focus".into(), "blur".into()]),
+        // All webview events
+        webview: EventFilter::All,
+        capture_window_titles: true,
+    },
+    ..Default::default()
+});
+```
+
+Use `BreadcrumbOptions::disabled()` to turn off all of these breadcrumbs.
 
 ## Custom Sentry Browser Configuration
 
@@ -114,6 +145,7 @@ use tauri_plugin_sentry::{JavaScriptOptions, Options, Sentry};
 
 let sentry_plugin = Sentry::with_options(Options {
     javascript: JavaScriptOptions::no_injection(),
+    ..Default::default()
 });
 
 // Add `sentry_plugin.clone()` to the Sentry options as above

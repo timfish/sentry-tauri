@@ -8,7 +8,8 @@ use tauri::{
     generate_handler,
     ipc::Invoke,
     plugin::{Builder, Plugin, TauriPlugin},
-    AppHandle, Manager, Runtime,
+    webview::PageLoadPayload,
+    AppHandle, Manager, RunEvent, Runtime, Url, Webview, Window,
 };
 
 #[derive(Debug, Clone)]
@@ -41,10 +42,14 @@ impl Default for JavaScriptOptions {
 #[derive(Debug, Clone, Default)]
 pub struct Options {
     pub javascript: JavaScriptOptions,
+    pub breadcrumbs: BreadcrumbOptions,
 }
 
+mod breadcrumbs;
 mod commands;
 mod process;
+
+pub use breadcrumbs::{BreadcrumbOptions, EventFilter};
 
 fn js_init_script(options: &JavaScriptOptions) -> String {
     include_str!("../dist/inject.min.js").replace("__DEBUG__", &format!("{}", options.debug))
@@ -125,6 +130,27 @@ impl<R: Runtime> Plugin<R> for Sentry {
             generate_handler![commands::breadcrumb, commands::envelope];
         handler(invoke)
     }
+
+    fn window_created(&mut self, window: Window<R>) {
+        breadcrumbs::on_window_created(&self.options.breadcrumbs, &window);
+    }
+
+    fn webview_created(&mut self, webview: Webview<R>) {
+        breadcrumbs::on_webview_created(&self.options.breadcrumbs, &webview);
+    }
+
+    fn on_navigation(&mut self, webview: &Webview<R>, url: &Url) -> bool {
+        breadcrumbs::on_navigation(&self.options.breadcrumbs, webview, url);
+        true
+    }
+
+    fn on_page_load(&mut self, webview: &Webview<R>, payload: &PageLoadPayload<'_>) {
+        breadcrumbs::on_page_load(&self.options.breadcrumbs, webview, payload);
+    }
+
+    fn on_event(&mut self, app: &AppHandle<R>, event: &RunEvent) {
+        breadcrumbs::on_event(&self.options.breadcrumbs, app, event);
+    }
 }
 
 pub fn init_with_options<R: Runtime>(
@@ -144,7 +170,7 @@ pub fn init_with_options<R: Runtime>(
         plugin_builder = plugin_builder.js_init_script(js_init_script(&options.javascript));
     }
 
-    plugin_builder.build()
+    breadcrumbs::attach(plugin_builder, Arc::new(options.breadcrumbs)).build()
 }
 
 pub fn init<R: Runtime>(sentry_client: &sentry::Client) -> TauriPlugin<R> {
@@ -156,6 +182,7 @@ pub fn init_with_no_injection<R: Runtime>(sentry_client: &sentry::Client) -> Tau
         sentry_client,
         Options {
             javascript: JavaScriptOptions::no_injection(),
+            ..Default::default()
         },
     )
 }
