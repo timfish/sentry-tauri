@@ -1,0 +1,11 @@
+"$schema" = "schemas/schema.json"
+
+[[permission]]
+identifier = "allow-scope"
+description = "Enables the scope command."
+commands.allow = ["scope"]
+
+[[permission]]
+identifier = "deny-scope"
+description = "Denies the scope command."
+commands.deny = ["scope"]

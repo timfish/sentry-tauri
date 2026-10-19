@@ -98,6 +98,8 @@ The Plugin:
 - By default injects and initialises `@sentry/browser` in every web-view
 - Includes custom `transport` and `beforeBreadcrumb` hook that passes events and
   breadcrumbs to the Rust SDK via the Tauri `invoke` API
+- Sends the user, tags, extra and contexts that you set in the browser to the
+  Rust SDK, so Rust panics and events include them too
 - Tauri + `serde` + existing Sentry Rust types = Deserialisation mostly Just
   Works™️
 - Adds breadcrumbs for Tauri app, window and webview events
