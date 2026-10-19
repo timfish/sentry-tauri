@@ -10,24 +10,29 @@ function frameFilenames(event: Event): string[] {
   return (event.exception?.values || []).flatMap((e) => (e.stacktrace?.frames || []).map((f) => f.filename || ''));
 }
 
+// WebView2 adds frames such as `<anonymous>` that are not URLs.
+const isUrlOrPath = (filename: string) => filename.includes('://') || filename.startsWith('/');
+
+function expectFramesNormalized(event: Event): void {
+  const filenames = frameFilenames(event).filter(isUrlOrPath);
+  expect(filenames.length).toBeGreaterThan(0);
+  for (const filename of filenames) {
+    expect(filename).toMatch(/^app:\/\/\//);
+  }
+  expect(JSON.stringify(event.exception)).not.toMatch(WEBVIEW_ORIGINS);
+}
+
 describe('normalize paths', () => {
   test('JavaScript error frames use app:///', async () => {
     const [event] = itemsOfType(await runScenario('js-error', hasEvent), 'event');
 
-    const filenames = frameFilenames(event);
-    expect(filenames.length).toBeGreaterThan(0);
-    for (const filename of filenames) {
-      expect(filename).toMatch(/^app:\/\/\//);
-      expect(filename).not.toMatch(WEBVIEW_ORIGINS);
-    }
+    expectFramesNormalized(event);
   });
 
   test('debug images use app:/// and keep the debug ID', async () => {
     const [event] = itemsOfType(await runScenario('debug-id', hasEvent), 'event');
 
-    for (const filename of frameFilenames(event)) {
-      expect(filename).toMatch(/^app:\/\/\//);
-    }
+    expectFramesNormalized(event);
     expect(event.debug_meta?.images).toEqual([
       {
         type: 'sourcemap',
