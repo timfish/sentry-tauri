@@ -313,7 +313,11 @@ pub(crate) fn attach<R: Runtime>(
     );
     builder
         .on_window_ready(move |window| on_window_created(&o1, &window))
-        .on_webview_ready(move |webview| on_webview_created(&o2, &webview))
+        .on_webview_ready(move |webview| {
+            on_webview_created(&o2, &webview);
+            #[cfg(feature = "webview-crashes")]
+            crate::webview_crash::install(&webview);
+        })
         .on_navigation(move |webview, url| {
             on_navigation(&o3, webview, url);
             true

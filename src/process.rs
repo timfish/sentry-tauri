@@ -30,6 +30,11 @@ impl WebviewTags {
         }
     }
 
+    #[cfg(feature = "webview-crashes")]
+    pub(crate) fn webview(&self) -> &str {
+        &self.webview
+    }
+
     fn pairs(&self) -> [(&'static str, &str); 3] {
         [
             (PROCESS_TAG, WEBVIEW_PROCESS),

@@ -56,12 +56,15 @@ however, make sure that you have `sentry:default` in your capabilities:
 
 ## Cargo features
 
-Both features are on by default:
+All features are on by default:
 
 - `minidump`: enables the `minidump` feature of `sentry` to capture native
   crashes
 - `wry`: enables the `wry` feature of `tauri` to add the webview version to
   the `browser` context
+- `webview-crashes`: captures webview process crashes. See
+  [Webview Process Crashes](#webview-process-crashes). It enables `wry` and
+  the `release-health` feature of `sentry`
 
 If your app does not use the wry runtime, turn off the default features and
 enable only `minidump`:
@@ -70,7 +73,8 @@ enable only `minidump`:
 tauri-plugin-sentry = { version = "0.8", default-features = false, features = ["minidump"] }
 ```
 
-Without `wry`, events have no `browser` context with the webview version.
+This also turns off `webview-crashes`. Without `wry`, events have no
+`browser` context with the webview version.
 
 ## Usage
 
@@ -164,6 +168,34 @@ let sentry_plugin = Sentry::with_options(Options {
 ```
 
 Use `BreadcrumbOptions::disabled()` to turn off all of these breadcrumbs.
+
+## Webview Process Crashes
+
+Webviews run in separate processes, so the minidump integration does not
+capture their crashes. With the `webview-crashes` feature, when a webview
+process exits, the plugin captures an event with the `event.process: webview`,
+`tauri.webview` and `tauri.window` tags, and adds a breadcrumb. For crashes
+and out-of-memory exits, it also ends the session with the `crashed` status.
+
+- **Windows**: Uses the WebView2 `ProcessFailed` event, which gives the
+  reason.
+- **Linux**: Uses the WebKitGTK `web-process-terminated` signal, which gives
+  the reason.
+- **macOS and iOS**: WebKit gives no reason and Tauri only exposes this hook
+  on the app builder. Call `web_content_process_terminated` from the hook.
+  The hook replaces the Tauri default, so reload the webview yourself:
+
+```rust
+let builder = tauri::Builder::default();
+
+#[cfg(any(target_os = "macos", target_os = "ios"))]
+let builder = builder.on_web_content_process_terminate(|webview| {
+    tauri_plugin_sentry::web_content_process_terminated(webview);
+    let _ = webview.reload();
+});
+```
+
+- **Android**: Not supported.
 
 ## Custom Sentry Browser Configuration
 
