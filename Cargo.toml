@@ -10,8 +10,9 @@ links = "tauri-plugin-sentry"
 exclude = ["/examples", "/node_modules", "/target", "/test"]
 
 [features]
-default = ["minidump"]
+default = ["minidump", "wry"]
 minidump = ["sentry/minidump"]
+wry = ["tauri/wry"]
 
 [dependencies]
 base64 = "0.23"
@@ -21,6 +22,12 @@ serde_json = "1"
 tauri = { version = "2", default-features = false }
 thiserror = "2"
 schemars = "0.8"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Storage_Packaging_Appx",
+] }
 
 [build-dependencies]
 tauri-plugin = { version = "2", features = ["build"] }

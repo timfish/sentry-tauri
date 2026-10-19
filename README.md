@@ -54,6 +54,24 @@ however, make sure that you have `sentry:default` in your capabilities:
 }
 ```
 
+## Cargo features
+
+Both features are on by default:
+
+- `minidump`: enables the `minidump` feature of `sentry` to capture native
+  crashes
+- `wry`: enables the `wry` feature of `tauri` to add the webview version to
+  the `browser` context
+
+If your app does not use the wry runtime, turn off the default features and
+enable only `minidump`:
+
+```toml
+tauri-plugin-sentry = { version = "0.8", default-features = false, features = ["minidump"] }
+```
+
+Without `wry`, events have no `browser` context with the webview version.
+
 ## Usage
 
 This example also shows usage of
@@ -92,6 +110,19 @@ pub fn run() {
 Sentry options before `sentry::init` and pass the original to Tauri. The
 integration adds `tauri` and `cargo:tauri-plugin-sentry` to the SDK metadata
 of every event, including minidumps from the crash reporter process.
+
+The integration also adds this context to events from Rust and the browser:
+
+- `app`: name, version, identifier, start time, architecture, whether a
+  window has focus (`in_foreground`) and the build type (`app-store` for Mac
+  App Store builds, `windows-store` for packaged Windows apps)
+- `runtime`: Tauri and its version
+- `browser`: the webview (WebView2, WKWebView, WebKitGTK or Android System
+  WebView) and its version
+- `device`: the resolution and scale factor of the primary monitor
+
+The webview version needs the `wry` feature. See
+[Cargo features](#cargo-features).
 
 The Plugin:
 
