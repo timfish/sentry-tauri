@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-sentry-api",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Tauri Plugin for Sentry",
   "license": "Apache-2.0 OR MIT",
   "files": [
@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
-    "@sentry/browser": "^10.8.0",
-    "@sentry/core": "^10.8.0",
+    "@sentry/browser": "^11.10.0",
+    "@sentry/core": "^11.10.0",
     "rollup": "^4.50.0",
     "@rollup/plugin-terser": "^0.4.4",
     "typescript": "^5.1.6",

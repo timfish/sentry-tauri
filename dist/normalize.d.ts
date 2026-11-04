@@ -12,4 +12,6 @@ export declare function normalizeUrls(event: Event, origin: string): Event;
  * Tauri serves the app from `tauri://localhost` on macOS, iOS and Linux and
  * from `http://tauri.localhost` on Windows and Android.
  */
-export declare const normalizeUrlsIntegration: () => import("@sentry/core").Integration;
+export declare const normalizeUrlsIntegration: () => import("@sentry/core").Integration & {
+    name: string;
+};

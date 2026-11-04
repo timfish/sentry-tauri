@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.9.0
+
+- feat: Update `sentry` to v0.49.5 and `@sentry/browser` to v11 (#49)
+- feat: Tag events with the process, webview and window they came from (#42)
+- feat: Normalise web-view URLs to `app:///` (#43)
+- feat: Add breadcrumbs for Tauri app, window and webview events (#44)
+- feat: Sync scope from the webview to the Rust SDK (#45)
+- feat: Add app, Tauri runtime, webview and screen context. Add the `wry` feature, on by default, which adds the webview version to the `browser` context (#46)
+- feat: Capture webview process crashes. Add the `webview-crashes` feature, on by default, which enables `wry` and the `release-health` feature of `sentry` (#47)
+
 ## v0.8.0
 
 - feat: Add `tauri_plugin_sentry::Sentry`, which is both a Tauri plugin and a Sentry integration. Add a clone to `sentry::ClientOptions` before `sentry::init` and pass the original to `tauri::Builder::plugin`. The integration adds `tauri` to the SDK integrations and adds the `cargo:tauri-plugin-sentry` package to the SDK metadata of events, which includes minidump events from the crash reporter process. `init`, `init_with_options` and `init_with_no_injection` still work. (#41)
