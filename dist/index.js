@@ -60,4 +60,6 @@ export const defaultOptions = {
     ],
     transport: makeRendererTransport,
     beforeBreadcrumb: sendBreadcrumbToRust,
+    // The Rust SDK cannot parse streamed span envelope items
+    traceLifecycle: 'static',
 };
