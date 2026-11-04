@@ -27,8 +27,8 @@ Add `sentry` and `tauri-plugin-sentry` to dependencies in `Cargo.toml`:
 
 ```toml
 [dependencies]
-sentry = "0.49"
-tauri-plugin-sentry = "0.8"
+sentry = "0.49.5"
+tauri-plugin-sentry = "0.9"
 ```
 
 Run one of these commands to add the capabilities:
@@ -70,7 +70,7 @@ If your app does not use the wry runtime, turn off the default features and
 enable only `minidump`:
 
 ```toml
-tauri-plugin-sentry = { version = "0.8", default-features = false, features = ["minidump"] }
+tauri-plugin-sentry = { version = "0.9", default-features = false, features = ["minidump"] }
 ```
 
 This also turns off `webview-crashes`. Without `wry`, events have no
